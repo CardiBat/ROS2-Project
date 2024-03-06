@@ -29,10 +29,13 @@ Più nello specifico, il nodo di controllo si comporta da publisher degli input 
 I servizi in ROS rispondono all'esigenza dell'archiettura client-server il quale non è nativo per i topic così come sono stati creati. Infatti, un nodo tramite un topic classico manda un'informazione ogni x tempo ma non si aspetta una risposta dall'altra parte (come già accennato, segue il paradigma pub-sub).  
 Tramite i servizi, invece, è possibile implementare ciò che caratterizza l'interazione tipicamente web in cui vi sono richieste e risposte, dei server che si preoccupano di esporre servizi e i client che ne usufruiscono.
 
+<p>&nbsp;</p>
+
 <div align="center">
   <img src="/services.png" alt="services.png">
 </div>
-<!-- Commento -->  
+
+<p>&nbsp;</p>
 
 
 
