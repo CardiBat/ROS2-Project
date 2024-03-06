@@ -86,3 +86,19 @@ virt-manager
 
 e installare il sistema operativo da file ISO scaricato dal sito ufficiale.
 
+
+### Installazione delle librerie e dipendenze richieste da ROS2 Foxy
+
+Sarà opportuno installare i compilatori e le librerie Python richieste. Eseguire quindi i seguenti comandi:
+
+```bash
+sudo apt update
+```
+```bash
+sudo apt install build-essential cmake git
+```
+```bash
+sudo apt install python3-rosdep python3-rosinstall-generator python3-wstool python3-rosinstall build-essential
+```
+
+
