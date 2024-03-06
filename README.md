@@ -54,33 +54,33 @@ Quindi, si procederà alla creazione di un ambiente virtuale che consenta (nel c
 
 Prima di procedere, controllare che la propria macchina sia compatibile con la virtualizzazione integrata UNIX. Lanciare quindi il comando:
 
-```bash
+```sh
 $ egrep -c '(vmx|svm)' /proc/cpuinfo
 ```
 
 Se il comando restituisce un numero maggiore di 0, significa che il processore supporta la virtualizzazione. Se restituisce 0, potrebbe essere necessario abilitare la virtualizzazione nel BIOS.  
 A questo punto è possibile procedere con l'installazione di KVM:  
 
-```bash
+```sh
 sudo apt update
 ```
-```bash
+```sh
 sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager
 ```
 
 Occorre inoltre aggiungersi ai gruppi opportuni per evitare problemi:
 
-```bash
+```sh
 sudo adduser `id -un` libvirt
 ```
-```bash
+```sh
 sudo adduser `id -un` kvm
 ```
 
 A questo punto, dopo aver riavviato la macchina per applicare le modifiche, si può procedere a lanciare KVM e a creare una VM Ubuntu 20.04 necessaria per ROS2 Foxy, con 4Gb di RAM e 4 Cores.  
 Lanciare quindi il seguente comando:
 
-```bash
+```sh
 virt-manager
 ```
 
@@ -91,14 +91,76 @@ e installare il sistema operativo da file ISO scaricato dal sito ufficiale.
 
 Sarà opportuno installare i compilatori e le librerie Python richieste. Eseguire quindi i seguenti comandi:
 
-```bash
+```sh
 sudo apt update
 ```
-```bash
+```sh
 sudo apt install build-essential cmake git
 ```
-```bash
+```sh
 sudo apt install python3-rosdep python3-rosinstall-generator python3-wstool python3-rosinstall build-essential
 ```
 
+### Download del Codice Sorgente di ROS
+
+Inizializzazione `rosdep` che aiuta a installare le dipendenze di sistema per i sorgenti da compilare.
+
+```sh
+sudo rosdep init
+rosdep update
+```
+
+### Creazione del Workspace Catkin
+Per iniziare la configurazione dell'ambiente ROS, è necessaria la creazione di un workspace Catkin. Questo workspace fungerà da contenitore per i sorgenti e i pacchetti ROS. La creazione può essere effettuata con i seguenti comandi:
+
+```sh
+mkdir ~/ros_catkin_ws
+cd ~/ros_catkin_ws
+```
+
+### Selezione dei Pacchetti con `rosinstall_generator`
+L'utilizzo di `rosinstall_generator` permette di selezionare specifiche parti di ROS per l'installazione. È possibile optare per l'installazione di componenti essenziali come `ros_comm` o per una versione più completa con `desktop-full`. Ad esempio:
+
+```sh
+rosinstall_generator desktop --rosdistro noetic --deps --tar > noetic-desktop.rosinstall
+wstool init -j8 src noetic-desktop.rosinstall
+```
+
+### Compilazione di ROS
+
+Installazione delle Dipendenze tramite `rosdep`.  
+È fondamentale garantire che tutte le dipendenze dei pacchetti selezionati siano soddisfatte. Questo è possibile mediante l'utilizzo di `rosdep`:
+
+```sh
+rosdep install --from-paths src --ignore-src --rosdistro noetic -y
+```
+
+Procedura di Compilazione.  
+Per la compilazione del workspace Catkin, è possibile utilizzare `catkin_make_isolated` o `colcon`. Quest'ultimo è raccomandato per ROS Noetic e versioni successive:
+
+```sh
+./src/catkin/bin/catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release
+```
+
+In alternativa, per l'uso di `colcon`:
+
+```sh
+colcon build --symlink-install
+```
+
+### Ottimizzazione e Personalizzazione dei Componenti
+Durante la fase di compilazione, si presenta l'opportunità di escludere specifici pacchetti ROS non necessari. Il comando `rosinstall_generator` può essere modificato di conseguenza per riflettere queste preferenze.
+
+### Processo di Disinstallazione e Ripristino
+
+Nel caso in cui ROS sia stato installato attraverso `catkin_make_isolated` con l'opzione `--install`, i componenti si troveranno all'interno di una sottodirectory `install_isolated` del workspace. Per procedere con la rimozione di ROS, è sufficiente eliminare tale directory insieme al resto del workspace di compilazione:
+
+```sh
+cd ~/ros_catkin_ws
+rm -rf build_isolated devel_isolated install_isolated
+```
+
+Pulizia e Nuova Configurazione: Per iniziare nuovamente il processo di installazione da un ambiente pulito, è consigliabile rimuovere qualsiasi configurazione residua, inclusi i riferimenti all'ambiente ROS presenti nel file `.bashrc`.
+
+Compilando ROS da zero, è possibile apportare modifiche ai pacchetti inclusi o alle loro configurazioni, offrendo una flessibilità massima e consentendo l'adattamento alle specifiche esigenze del progetto.
 
