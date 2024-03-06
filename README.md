@@ -21,7 +21,9 @@ Questo insieme di nodi, ovviamente, può essere programmato ad hoc a seconda del
 Sapendo quindi che ogni nodo è responsabile di una determinata azione, è importante chiarire il funzionamento dei topic che ne permettono la comunicazione tra essi. Quando si aprono finestre di terminale e si decide di assegnare per ognuna un nodo, la loro interazione segue il paradigma 'pub-sub' a scambio di messaggi dove uno o più nodi fungono da publishers e altrettanti da subscribers. Quindi, i topic non sono altro che gli intermediari di comunicazione tra i vari nodi.  
 
 <p>&nbsp;</p>
+
 ![Turtlesim-topic](/turtlesim.png)  
+
 <p>&nbsp;</p>
 
 Come si può osservare, in questo grafico (generato tramite rqt_graph con group 0 e Nodes/Topics view) si hanno i due nodi già menzionati (la tartaruga e il suo controller) e in mezzo vi sono i vari topic di comunicazione. In particolare
