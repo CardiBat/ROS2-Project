@@ -63,6 +63,8 @@ A questo punto è possibile procedere con l'installazione di KVM:
 
 ```bash
 sudo apt update
+```
+```bash
 sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager
 ```
 
@@ -70,5 +72,17 @@ Occorre inoltre aggiungersi ai gruppi opportuni per evitare problemi:
 
 ```bash
 sudo adduser `id -un` libvirt
+```
+```bash
 sudo adduser `id -un` kvm
 ```
+
+A questo punto, dopo aver riavviato la macchina per applicare le modifiche, si può procedere a lanciare KVM e a creare una VM Ubuntu 20.04 necessaria per ROS2 Foxy, con 4Gb di RAM e 4 Cores.  
+Lanciare quindi il seguente comando:
+
+```bash
+virt-manager
+```
+
+e installare il sistema operativo da file ISO scaricato dal sito ufficiale.
+
