@@ -107,6 +107,8 @@ Inizializzazione `rosdep` che aiuta a installare le dipendenze di sistema per i 
 
 ```sh
 sudo rosdep init
+```
+```sh
 rosdep update
 ```
 
@@ -115,11 +117,13 @@ Per iniziare la configurazione dell'ambiente ROS, è necessaria la creazione di 
 
 ```sh
 mkdir ~/ros_catkin_ws
+```
+```sh
 cd ~/ros_catkin_ws
 ```
 
-### Selezione dei Pacchetti con `rosinstall_generator`
-L'utilizzo di `rosinstall_generator` permette di selezionare specifiche parti di ROS per l'installazione. È possibile optare per l'installazione di componenti essenziali come `ros_comm` o per una versione più completa con `desktop-full`. Ad esempio:
+### Selezione dei Pacchetti
+L'utilizzo di `rosinstall_generator` permette di selezionare specifiche parti di ROS per la compilazione e l'installazione. È possibile optare per l'installazione di componenti essenziali come `ros_comm` o per una versione più completa con `desktop-full`. Ad esempio:
 
 ```sh
 rosinstall_generator desktop --rosdistro noetic --deps --tar > noetic-desktop.rosinstall
@@ -127,15 +131,12 @@ wstool init -j8 src noetic-desktop.rosinstall
 ```
 
 ### Compilazione di ROS
-
-Installazione delle Dipendenze tramite `rosdep`.  
 È fondamentale garantire che tutte le dipendenze dei pacchetti selezionati siano soddisfatte. Questo è possibile mediante l'utilizzo di `rosdep`:
 
 ```sh
 rosdep install --from-paths src --ignore-src --rosdistro noetic -y
 ```
 
-Procedura di Compilazione.  
 Per la compilazione del workspace Catkin, è possibile utilizzare `catkin_make_isolated` o `colcon`. Quest'ultimo è raccomandato per ROS Noetic e versioni successive:
 
 ```sh
@@ -148,8 +149,6 @@ In alternativa, per l'uso di `colcon`:
 colcon build --symlink-install
 ```
 
-### Ottimizzazione e Personalizzazione dei Componenti
-Durante la fase di compilazione, si presenta l'opportunità di escludere specifici pacchetti ROS non necessari. Il comando `rosinstall_generator` può essere modificato di conseguenza per riflettere queste preferenze.
 
 ### Processo di Disinstallazione e Ripristino
 
@@ -157,10 +156,17 @@ Nel caso in cui ROS sia stato installato attraverso `catkin_make_isolated` con l
 
 ```sh
 cd ~/ros_catkin_ws
+```
+```sh
 rm -rf build_isolated devel_isolated install_isolated
 ```
 
-Pulizia e Nuova Configurazione: Per iniziare nuovamente il processo di installazione da un ambiente pulito, è consigliabile rimuovere qualsiasi configurazione residua, inclusi i riferimenti all'ambiente ROS presenti nel file `.bashrc`.
+Pulizia e Nuova Configurazione: Per iniziare nuovamente il processo di installazione da un ambiente pulito, è consigliabile rimuovere qualsiasi configurazione residua, inclusi i riferimenti all'ambiente ROS presenti nel file `.bashrc`.  
+Questi riferimenti possono includere variabili d'ambiente, modifiche al `PATH`, o sorgenti per script di setup generati da ROS. Per rimuoverli, è necessario editare il file `.bashrc` utilizzando un editor di testo e cancellare manualmente le righe pertinenti. Ad esempio, si potrebbero cercare e rimuovere linee simili a queste:
 
-Compilando ROS da zero, è possibile apportare modifiche ai pacchetti inclusi o alle loro configurazioni, offrendo una flessibilità massima e consentendo l'adattamento alle specifiche esigenze del progetto.
+```sh
+source /opt/ros/noetic/setup.bash
+source ~/ros_catkin_ws/devel_isolated/setup.bash
+```
 
+Dopo aver apportato le modifiche, salvare il file e riavviare il terminale per assicurarsi che le modifiche abbiano effetto. Questo passaggio garantisce che l'ambiente del terminale sia privo di qualsiasi configurazione relativa a ROS, permettendo una nuova installazione o la configurazione di un ambiente differente in modo pulito e senza conflitti.
