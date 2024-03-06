@@ -32,7 +32,8 @@ Tramite i servizi, invece, è possibile implementare ciò che caratterizza l'int
 <div align="center">
   <img src="/services.png" alt="services.png">
 </div>
-<!-- Commento -->
+<!-- Commento -->  
+
 
 
 Nell'immagine soprastante vi è la rappresentazione dell'archiettura client-server in cui un client (ma potrebbero essere anche di più) manda richieste e riceve risposte tramite il servizio.  
