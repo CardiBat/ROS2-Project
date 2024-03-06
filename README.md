@@ -20,10 +20,15 @@ Sapendo quindi che ogni nodo è responsabile di una determinata azione, è impor
 
 ![Turtlesim-topic](/turtlesim.png)  
 
-Come si può osservare, in questo grafico (generato tramite rqt_graph) si hanno i due nodi già menzionati (la tartaruga e il suo controller) e in mezzo vi sono i vari topic
-
+Come si può osservare, in questo grafico (generato tramite rqt_graph con group 0 e Nodes/Topics view) si hanno i due nodi già menzionati (la tartaruga e il suo controller) e in mezzo vi sono i vari topic di comunicazione. In particolare
+vi è il controller che comunica tramite topic 'cmd_vel' gli input da tastiera, mentre l'oggetto tartaruga risponde comunica tramite due canali distinti il feedback e il suo stato attuale.  
+Più nello specifico, il nodo di controllo si comporta da publisher degli input da tastiera, mentre il nodo turtlesim si iscrive a quest'ultimo topic. Allo stesso modo, turtlesim opera publishing di stato feedback e status mentre il controller si iscrive a questi ultimi.
 
 ### Servizi
+
+I servizi in ROS rispondono all'esigenza dell'archiettura client-server il quale non è nativo per i topic così come sono stati creati. Infatti, un nodo tramite un topic classico manda un'informazione ogni x tempo ma non si aspetta una risposta dall'altra parte (come già accennato, segue il paradigma pub-sub).  
+Tramite i servizi, invece, è possibile implementare ciò che caratterizza l'interazione tipica web in cui vi sono richieste e risposte, dei server che si preoccupano di esporre servizi e i client che ne usufruiscono.  
+Per soddisfare ciò
 
 ### Altro
 
