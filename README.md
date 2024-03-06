@@ -45,6 +45,4 @@ Nell'immagine soprastante vi è la rappresentazione dell'archiettura client-serv
 Un esempio di come questo possa essere implementato può essere osservato sempre tramite il pacchetto demo utilizzando su un terminale add_two_ints_server (nodo Server) e in un'altra finestra la keyword 'call' aggiungendo i parametri a e b. Così facendo, si manderà una richiesta al server il quale risponderà con il risultato.
 
 
-### Altro
-
-## Compilazione
+## Compilazione e Installazione
