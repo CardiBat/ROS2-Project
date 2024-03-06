@@ -46,3 +46,14 @@ Un esempio di come questo possa essere implementato può essere osservato sempre
 
 
 ## Compilazione e Installazione
+
+Normalmente, l'installazione (su Ubuntu) prevedere un semplice comando da terminale e l'installazione viene completata automaticamente. Nel nostro caso, però, si cercherà di compilare manualmente l'insieme di file per snellire il più possibile l'installazione e facilitarne il porting su un'architettura RISC-V (nonostante ROS sia progettato per architetture Intel)  
+Quindi, si procederà alla creazione di un ambiente virtuale che consenta (nel caso di errori irreversibili) di non danneggiare il sistema e di conseguenza che si possano provare varie combinazioni di compilazione.  
+
+### Installazione di un ambiente virtuale
+
+Prima di procedere, controllare che la propria macchina sia compatibile con la virtualizzazione integrata UNIX. Lanciare quindi il comando:
+
+```bash
+$ egrep -c '(vmx|svm)' /proc/cpuinfo
+
