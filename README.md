@@ -16,7 +16,10 @@ Questo insieme di nodi, ovviamente, può essere programmato ad hoc a seconda del
 
 ### Topics
 
-Sapendo quindi che ogni nodo è responsabile di una determinata azione, è importante chiarire il funzionamento dei topic che ne permettono la comunicazione tra essi. Quando si aprono finestre di terminale e si decide di assegnare per ognuna un nodo, la loro interazione segue il paradigma 'pub-sub' a scambio di messaggi dove uno o più nodi fungono da publishers e altrettanti da subscribers. Quindi, i topic non sono altro che 
+Sapendo quindi che ogni nodo è responsabile di una determinata azione, è importante chiarire il funzionamento dei topic che ne permettono la comunicazione tra essi. Quando si aprono finestre di terminale e si decide di assegnare per ognuna un nodo, la loro interazione segue il paradigma 'pub-sub' a scambio di messaggi dove uno o più nodi fungono da publishers e altrettanti da subscribers. Quindi, i topic non sono altro che gli intermediari di comunicazione tra i vari nodi.  
+Per capire meglio, qui sotto è disponibile un immagine che chiarisce questo fatto.
+![Turtlesim-topic](./img/turtlesim.png)
+
 
 
 ### Servizi
