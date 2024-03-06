@@ -56,4 +56,19 @@ Prima di procedere, controllare che la propria macchina sia compatibile con la v
 
 ```bash
 $ egrep -c '(vmx|svm)' /proc/cpuinfo
+```
 
+Se il comando restituisce un numero maggiore di 0, significa che il processore supporta la virtualizzazione. Se restituisce 0, potrebbe essere necessario abilitare la virtualizzazione nel BIOS.  
+A questo punto è possibile procedere con l'installazione di KVM:  
+
+```bash
+sudo apt update
+sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager
+```
+
+Occorre inoltre aggiungersi ai gruppi opportuni per evitare problemi:
+
+```bash
+sudo adduser `id -un` libvirt
+sudo adduser `id -un` kvm
+```
