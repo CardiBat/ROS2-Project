@@ -21,7 +21,7 @@ Sapendo quindi che ogni nodo è responsabile di una determinata azione, è impor
 
 Come si può osservare, in questo grafico (generato tramite rqt_graph) si hanno i due nodi già menzionati (la tartaruga e il suo controller) e in mezzo vi sono i vari topic
 
-
+![Turtlesim-topic](/turtlesim.png)  
 ### Servizi
 
 ### Altro
