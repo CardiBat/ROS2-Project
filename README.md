@@ -30,7 +30,7 @@ I servizi in ROS rispondono all'esigenza dell'archiettura client-server il quale
 Tramite i servizi, invece, è possibile implementare ciò che caratterizza l'interazione tipicamente web in cui vi sono richieste e risposte, dei server che si preoccupano di esporre servizi e i client che ne usufruiscono.  
 
 <div align="center">
-  ![Turtlesim-topic](/services.png)  
+  <img src="/services.png" alt="services.png">
 </div>
 
 Nell'immagine soprastante vi è la rappresentazione dell'archiettura client-server in cui un client (ma potrebbero essere anche di più) manda richieste e riceve risposte tramite il servizio.  
