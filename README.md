@@ -97,17 +97,31 @@ sudo apt update
 ```sh
 sudo apt install build-essential cmake git python3-rosdep python3-rosinstall-generator python3-wstool python3-rosinstall
 ```
+
+Nel caso non fosse installato, installare python:
+
 ```sh
 sudo apt update
 ```
 ```sh
 sudo apt install python3 python3-pip
 ```
+
+Infine, installare il compilatore colcon:
 ```sh
 sudo apt update
 ```
 ```sh
 pip3 install -U colcon-common-extensions
+```
+
+Settare quindi permanentemente la variabile d'ambiente. Aprire la shell:
+```sh
+nano ~/.bashrc
+```
+Aggiungere quindi la seguente riga a fine file, salvare e riaprire il terminale:
+```sh
+export PATH="$PATH:$HOME/.local/bin"
 ```
 
 
