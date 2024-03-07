@@ -120,11 +120,17 @@ cd ~/ros2_foxy_ws
 ```
 
 ### Selezione dei Pacchetti
-L'utilizzo di `rosinstall_generator` permette di selezionare specifiche parti di ROS da mettere nel file di configurazione .rosinstall. È possibile optare per l'inserimento di componenti essenziali come `ros_comm` o per una versione più completa con `desktop-full`. Ad esempio:
+L'utilizzo di `rosinstall_generator` permette di selezionare specifiche parti di ROS da mettere nel file di configurazione .rosinstall. È possibile optare per l'inserimento di componenti essenziali come `ros_comm` o per una versione più completa con `desktop-full`. In ogni caso, bisogna inserire i pacchetti voluti al posto di PKGNAME. In generale quindi:
 
 ```sh
-rosinstall_generator foxy --rosdistro foxy --deps --tar > foxy-desktop.rosinstall
+rosinstall_generator [PKGNAME] --rosdistro foxy --deps --tar > foxy-desktop.rosinstall
 ```
+Un esempio potrebbe essere considerare pacchetti come rclcpp per la programmazione client in C++, rclpy per la programmazione client in Python, e example_interfaces che fornisce esempi di interfacce di servizio e messaggi che potrebbero essere utilizzati per esperimenti e apprendimento.
+
+```sh
+rosinstall_generator rclcpp rclpy example_interfaces --rosdistro foxy --deps --tar > foxy-desktop.rosinstall
+```
+
 Successivamente si scaricheranno i pacchetti presenti sul file di configurazione appena creato:
 
 ```sh
