@@ -120,23 +120,25 @@ cd ~/ros2_foxy_ws
 ```
 
 ### Selezione dei Pacchetti
-L'utilizzo di `rosinstall_generator` permette di selezionare specifiche parti di ROS per la compilazione e l'installazione. È possibile optare per l'installazione di componenti essenziali come `ros_comm` o per una versione più completa con `desktop-full`. Ad esempio:
+L'utilizzo di `rosinstall_generator` permette di selezionare specifiche parti di ROS da mettere nel file di configurazione .rosinstall. È possibile optare per l'inserimento di componenti essenziali come `ros_comm` o per una versione più completa con `desktop-full`. Ad esempio:
 
 ```sh
 rosinstall_generator foxy --rosdistro foxy --deps --tar > foxy-desktop.rosinstall
 ```
+Successivamente si scaricheranno i pacchetti presenti sul file di configurazione appena creato:
+
 ```sh
 wstool init -j8 src foxy-desktop.rosinstall
 ```
 
 ### Compilazione di ROS
-È fondamentale garantire che tutte le dipendenze dei pacchetti selezionati siano soddisfatte. Questo è possibile mediante l'utilizzo di `rosdep`:
+È fondamentale garantire che tutte le dipendenze dei pacchetti selezionati siano soddisfatte prima della compilazione. Questo è possibile mediante l'utilizzo di `rosdep`:
 
 ```sh
 rosdep install --from-paths src --ignore-src --rosdistro foxy -y
 ```
 
-Utilizzare `colcon`, lo strumento di build consigliato per ROS 2, per compilare i pacchetti nel workspace:
+Utilizzando `colcon`, lo strumento di build consigliato per ROS 2, si compilano i pacchetti scaricati con le relative dipendenze:
 
 ```sh
 colcon build --symlink-install
