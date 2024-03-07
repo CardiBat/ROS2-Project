@@ -89,7 +89,7 @@ e installare il sistema operativo da file ISO scaricato dal sito ufficiale.
 
 ### Installazione delle librerie e dipendenze richieste da ROS2 Foxy
 
-Sarà opportuno installare i compilatori e le librerie Python richieste. Eseguire quindi i seguenti comandi:
+Sarà opportuno installare i compilatori e le librerie Python richieste, oltre a python se non è installato sulla propria macchina. Eseguire quindi i seguenti comandi:
 
 ```sh
 sudo apt update
@@ -97,6 +97,19 @@ sudo apt update
 ```sh
 sudo apt install build-essential cmake git python3-rosdep python3-rosinstall-generator python3-wstool python3-rosinstall
 ```
+```sh
+sudo apt update
+```
+```sh
+sudo apt install python3 python3-pip
+```
+```sh
+sudo apt update
+```
+```sh
+pip3 install -U colcon-common-extensions
+```
+
 
 ### Download del Codice Sorgente di ROS
 
@@ -153,21 +166,33 @@ colcon build --symlink-install
 
 ### Processo di Disinstallazione e Ripristino
 
-Nel caso in cui ROS sia stato installato attraverso `catkin_make_isolated` con l'opzione `--install`, i componenti si troveranno all'interno di una sottodirectory `install_isolated` del workspace. Per procedere con la rimozione di ROS, è sufficiente eliminare tale directory insieme al resto del workspace di compilazione:
+Per eliminare i componenti di ROS 2, è sufficiente rimuovere il workspace di compilazione, che tipicamente include le directory `build`, `install`, e `log`. Supponendo che il workspace si trovi in `~/ros2_foxy_ws`, eseguire i seguenti comandi:
 
 ```sh
-cd ~/ros_catkin_ws
+cd ~/ros2_foxy_ws
 ```
 ```sh
-rm -rf build_isolated devel_isolated install_isolated
+rm -rf build install log
 ```
+Questo rimuoverà tutte le directory relative alla compilazione e all'installazione dei pacchetti ROS 2.
 
-Pulizia e Nuova Configurazione: Per iniziare nuovamente il processo di installazione da un ambiente pulito, è consigliabile rimuovere qualsiasi configurazione residua, inclusi i riferimenti all'ambiente ROS presenti nel file `.bashrc`.  
-Questi riferimenti possono includere variabili d'ambiente, modifiche al `PATH`, o sorgenti per script di setup generati da ROS. Per rimuoverli, è necessario editare il file `.bashrc` utilizzando un editor di testo e cancellare manualmente le righe pertinenti. Ad esempio, si potrebbero cercare e rimuovere linee simili a queste:
+
+
+Per riconfigurare l'ambiente di sviluppo da uno stato pulito, è opportuno rimuovere eventuali riferimenti residui a ROS 2 presenti nel file di configurazione della shell, come `.bashrc` o `.zshrc`, a seconda della shell in uso. Questi riferimenti possono includere l'aggiunta del percorso di installazione di ROS 2 al `PATH`, nonché il sourcing di script di setup.
+
+Aprire il file di configurazione della shell con un editor di testo:
 
 ```sh
-source /opt/ros/noetic/setup.bash
-source ~/ros_catkin_ws/devel_isolated/setup.bash
+nano ~/.bashrc  # oppure utilizzare ~/.zshrc per zsh
+```
+
+Ricercare e rimuovere le linee associate all'ambiente ROS 2, che potrebbero apparire come:
+
+```sh
+source /opt/ros/foxy/setup.bash
+```
+```sh
+source ~/ros2_foxy_ws/install/local_setup.bash
 ```
 
 Dopo aver apportato le modifiche, salvare il file e riavviare il terminale per assicurarsi che le modifiche abbiano effetto. Questo passaggio garantisce che l'ambiente del terminale sia privo di qualsiasi configurazione relativa a ROS, permettendo una nuova installazione o la configurazione di un ambiente differente in modo pulito e senza conflitti.
