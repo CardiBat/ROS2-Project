@@ -95,10 +95,7 @@ Sarà opportuno installare i compilatori e le librerie Python richieste. Eseguir
 sudo apt update
 ```
 ```sh
-sudo apt install build-essential cmake git
-```
-```sh
-sudo apt install python3-rosdep python3-rosinstall-generator python3-wstool python3-rosinstall build-essential
+sudo apt install build-essential cmake git python3-rosdep python3-rosinstall-generator python3-wstool python3-rosinstall
 ```
 
 ### Download del Codice Sorgente di ROS
@@ -116,34 +113,30 @@ rosdep update
 Per iniziare la configurazione dell'ambiente ROS, è necessaria la creazione di un workspace Catkin. Questo workspace fungerà da contenitore per i sorgenti e i pacchetti ROS. La creazione può essere effettuata con i seguenti comandi:
 
 ```sh
-mkdir ~/ros_catkin_ws
+mkdir -p ~/ros2_foxy_ws/src
 ```
 ```sh
-cd ~/ros_catkin_ws
+cd ~/ros2_foxy_ws
 ```
 
 ### Selezione dei Pacchetti
 L'utilizzo di `rosinstall_generator` permette di selezionare specifiche parti di ROS per la compilazione e l'installazione. È possibile optare per l'installazione di componenti essenziali come `ros_comm` o per una versione più completa con `desktop-full`. Ad esempio:
 
 ```sh
-rosinstall_generator desktop --rosdistro noetic --deps --tar > noetic-desktop.rosinstall
-wstool init -j8 src noetic-desktop.rosinstall
+rosinstall_generator foxy --rosdistro foxy --deps --tar > foxy-desktop.rosinstall
+```
+```sh
+wstool init -j8 src foxy-desktop.rosinstall
 ```
 
 ### Compilazione di ROS
 È fondamentale garantire che tutte le dipendenze dei pacchetti selezionati siano soddisfatte. Questo è possibile mediante l'utilizzo di `rosdep`:
 
 ```sh
-rosdep install --from-paths src --ignore-src --rosdistro noetic -y
+rosdep install --from-paths src --ignore-src --rosdistro foxy -y
 ```
 
-Per la compilazione del workspace Catkin, è possibile utilizzare `catkin_make_isolated` o `colcon`. Quest'ultimo è raccomandato per ROS Noetic e versioni successive:
-
-```sh
-./src/catkin/bin/catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release
-```
-
-In alternativa, per l'uso di `colcon`:
+Utilizzare `colcon`, lo strumento di build consigliato per ROS 2, per compilare i pacchetti nel workspace:
 
 ```sh
 colcon build --symlink-install
