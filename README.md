@@ -238,3 +238,5 @@ NOTA IMPORTANTE: Il login è basato su architettura Intel (e quindi CISC). Sarà
 
 ### Breve descrizione dei nodi
 
+I nodi disponibili sono di due tipologie. Vi sono i `sifive-nodes` i quali sono composti da 4 Core ciascuno, mentre vi sono i `milkv-nodes` che possiedono fino a 64 core per ognuno di essi. Questi nodi differiscono anche nel loro utilizzo: i `sifive-nodes` non necessitano di pre-allocazione per essere eseguiti, mentre per i `milkv-nodes` vi è un job scheduler `Slurm` che prevede l'utilizzo di comandi ad hoc per l'utilizzo dei nodi.
+
