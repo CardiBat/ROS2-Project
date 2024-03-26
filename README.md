@@ -221,11 +221,11 @@ Per iniziare a esercitarsi sull'utilizzo di un processore di tipo RISC, è dispo
 ```sh
 ssh username@beta.dei.unibo.it -p 2223
 ```
+```
+username@mcimone-login:~$ 
+```
 
-> username@mcimone-login:~$ 
 
-
-
-Dopo aver inserito la password fornita dal docente, cambierà il proprio username dal terminale e verrà stampato il comando di 'nodeinfo' (richiamabile anche successivamente per avere informazioni in tempo reale.  
+Dopo aver inserito la password fornita dal docente, cambierà il proprio username dal terminale e verrà stampato il comando di `nodeinfo` (richiamabile anche successivamente per avere informazioni in tempo reale.  
 NOTA IMPORTANTE: Il login è basato su architettura Intel (e quindi CISC). Sarà quindi opportuno proseguire collegandosi a un nodo per raggiungere effettivamente l'architettura RISC-V
 
