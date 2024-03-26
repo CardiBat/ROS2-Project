@@ -222,9 +222,8 @@ Per iniziare a esercitarsi sull'utilizzo di un processore di tipo RISC, è dispo
 ssh username@beta.dei.unibo.it -p 2223
 ```
 
-```output
-username@mcimone-login:~$ 
-```
+> username@mcimone-login:~$ 
+
 
 
 Dopo aver inserito la password fornita dal docente, cambierà il proprio username dal terminale e verrà stampato il comando di 'nodeinfo' (richiamabile anche successivamente per avere informazioni in tempo reale.  
