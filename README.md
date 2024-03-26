@@ -210,3 +210,23 @@ source ~/ros2_foxy_ws/install/local_setup.bash
 ```
 
 Dopo aver apportato le modifiche, salvare il file e riavviare il terminale per assicurarsi che le modifiche abbiano effetto. Questo passaggio garantisce che l'ambiente del terminale sia privo di qualsiasi configurazione relativa a ROS, permettendo una nuova installazione o la configurazione di un ambiente differente in modo pulito e senza conflitti.
+
+
+## Verso il porting su RISC-V: Utilizzo del cluster Monte Cimone
+
+### Collegamento e Login 
+
+Per iniziare a esercitarsi sull'utilizzo di un processore di tipo RISC, è disponibile un cluster con vari nodi denominato Monte Cimone. Questa macchina è accessibile dal proprio PC (previa registrazione da form) tramite il comando di SSH:
+
+```sh
+ssh username@beta.dei.unibo.it -p 2223
+```
+
+```output
+username@mcimone-login:~$ 
+```
+
+
+Dopo aver inserito la password fornita dal docente, cambierà il proprio username dal terminale e verrà stampato il comando di 'nodeinfo' (richiamabile anche successivamente per avere informazioni in tempo reale.  
+NOTA IMPORTANTE: Il login è basato su architettura Intel (e quindi CISC). Sarà quindi opportuno proseguire collegandosi a un nodo per raggiungere effettivamente l'architettura RISC-V
+
