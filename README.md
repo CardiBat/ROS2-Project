@@ -268,7 +268,6 @@ Per completezza, viene riportato l'utilizzo generale di questi due comandi:
 ```sh
 salloc -n <> -t <hours:minutes:seconds> [-p <>] [-w <>] [--exclusive]
 ```
--x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x
 
 ```sh
 srun -n <n_task_to_allocate> [-N <n_nodes_to_run> ] [-p <partitions>] [-w <specific_node>] [-t <hours:minutes:seconds>] [--pty] command
