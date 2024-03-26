@@ -236,7 +236,45 @@ NOTA IMPORTANTE: Il login è basato su architettura Intel (e quindi CISC). Sarà
 
 
 
-### Breve descrizione dei nodi
+### Breve descrizione dei nodi e il loro uso
 
-I nodi disponibili sono di due tipologie. Vi sono i `sifive-nodes` i quali sono composti da 4 Core ciascuno, mentre vi sono i `milkv-nodes` che possiedono fino a 64 core per ognuno di essi. Questi nodi differiscono anche nel loro utilizzo: i `sifive-nodes` non necessitano di pre-allocazione per essere eseguiti, mentre per i `milkv-nodes` vi è un job scheduler `Slurm` che prevede l'utilizzo di comandi ad hoc per l'utilizzo dei nodi.
+I nodi disponibili sono di due tipologie a seconda della partizione. Vi sono i `sifive-nodes` i quali sono composti da 4 Core ciascuno, mentre vi sono i `milkv-nodes` che possiedono fino a 64 core per ognuno di essi. Per tutto questo sistema è installato `Slurm`, un job scheduler open source in grado di organizzare l'avvio di processi in modo semplice.  
+
+Per entrare rapidamente in un nodo e avviare un job, è sufficiente digitare il seguente comando (con nx = n° di core):
+
+```sh
+srun -n4 --pty bash
+```
+
+Questo comando è utile per utilizzare il primo nodo disponibile, ma se invece si vuole cercare ad esempio di usare un `milkv` allora bisogna seguire il processo completo, ossia allocazione, SSH, eventuale uso e infine deallocazione.  
+Per allocare un nodo si usa il comando `salloc` seguito dal n° di core e dal selettore di partizione con relativo nome. 
+
+salloc -n64 -p mcimone-milkvs
+
+Se non si sanno i nomi delle partizioni è sufficiente digitare il comando `sinfo` per averne l'elenco. In ogni caso, dopo questa operazione è possibile scoprire quale nodo della partizione è stato allocato con `nodeinfo` e infine eseguire il comando:
+
+```sh
+ssh fsimoni@mcimone-milkv-1
+```
+
+Riuscendo così ad entrare con Secure Shell dentro al nodo. Da qui, è possibile riutilizzare `srun` per avviare un job. Per deallocare, invece, digitare il comando `squeue` per scoprire il PID del nodo allocato e infine il comando di cancellazione seguito da quest'ultimo.
+
+```sh
+scancel [PID]
+```
+
+Per completezza, viene riportato l'utilizzo generale di questi due comandi:
+
+```sh
+salloc -n <> -t <hours:minutes:seconds> [-p <>] [-w <>] [--exclusive]
+```
+-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x
+
+```sh
+srun -n <n_task_to_allocate> [-N <n_nodes_to_run> ] [-p <partitions>] [-w <specific_node>] [-t <hours:minutes:seconds>] [--pty] command
+```
+
+Per una guida più approfondita, guardare la [guida specifico di CIMONE](https://gitlab.com/ecs-lab/courses/lab-of-big-data/riscv-hpc-perf/-/blob/main/2_slurm.md?ref_type=heads) oppure la [documentazione ufficiale](https://slurm.schedmd.com/overview.html)
+
+
 
