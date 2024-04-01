@@ -277,3 +277,21 @@ Per una guida più approfondita, guardare la [guida specifico di CIMONE](https:/
 
 
 
+### Installare le dipendenze sulla macchina RISC-V
+
+Riassumendo, le dipendenze necessarie per ROS2 sono:  
+
+- build-essential
+- cmake
+- git
+- python3-rosdep
+- python3-rosinstall-generator
+- python3-wstool
+- python3-rosinstall
+- python3
+- python3-pip  
+
+Bisogna quindi verificarne la presenza sulla macchina RISC-V, eventualmente installarle e a questo punto si potrà procedere con il porting.  
+_Nota importante_: Non si hanno privilegi di root per installare programmi sulla macchina che si usa, perciò eventuali programmi saranno da installare sulla propria directory Desktop e dovrà quindi essere aggiornata la variabile d'ambiente PATH
+
+
