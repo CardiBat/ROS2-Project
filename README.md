@@ -400,7 +400,27 @@ e quindi avviare rosdep:
 ```sh
 rosdep init
 rosdep update
-``
+```
+a questo punto si può utilizzare per risolvere le dipendenze:
+
+```sh
+rosdep install --from-paths src --ignore-src --rosdistro foxy -y
+```
+
+Ma ora ci sarà il problema di RISC-V, ovvero tentando la compilazione:
+```
+colcon build --symlink-install
+```
+
+L'output infatti ci dice:
+
+18 packages finished [1min 37s]
+  1 package failed: osrf_testing_tools_cpp
+  3 packages aborted: ament_cmake_export_include_directories ament_lint_cmake ament_xmllint
+  10 packages had stderr output: ament_cmake_test ament_copyright ament_cppcheck ament_flake8 ament_lint ament_lint_cmake ament_package ament_pep257 fastcdr osrf_testing_tools_cpp
+  86 packages not processed
+
+
 
 Utilizzare questo comando per clonare la repo (con token generato da github), dopo essersi spostati in `~/ros2_foxy_ws/src`:
 
