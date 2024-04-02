@@ -284,14 +284,22 @@ Riassumendo, le dipendenze necessarie per ROS2 sono:
 - build-essential
 - cmake
 - git
+- python3
+- python3-pip  
 - python3-rosdep
 - python3-rosinstall-generator
 - python3-wstool
-- python3-rosinstall
-- python3
-- python3-pip  
+- python3-rosinstall  
 
 Bisogna quindi verificarne la presenza sulla macchina RISC-V, eventualmente installarle e a questo punto si potrà procedere con il porting.  
 _Nota importante_: Non si hanno privilegi di root per installare programmi sulla macchina che si usa, perciò eventuali programmi saranno da installare sulla propria directory Desktop e dovrà quindi essere aggiornata la variabile d'ambiente PATH
+
+Runniamo il seguente comando:
+
+```sh
+dpkg -l | grep <nome_pacchetto>
+```
+
+Sostituendo `<nome_pacchetto>` con python3, git, cmake e build-essential. Notando la mancanza di rosdep, rosinstall-generator, wstool e rosinstall, essi saranno da installare nella directory corrente e da aggiungere al PATH.
 
 
