@@ -324,5 +324,13 @@ source ~/.bashrc
 ```
 Dopo un controllo generale con opzioni `--version` si noterà che tutto è stato installato completamente.
 
-### Cambiare directory per CMake
+### Prove di compilazione
+
+Per la compilazione di ROS, si utilizza normalmente `colcon` anche se non è detto che funzioni su RISC-V. Proveremo comunque a utilizzarlo installandolo con questo comando:
+
+```sh
+pip3 install --user -U colcon-common-extensions
+```
+A questo punto
+
 
