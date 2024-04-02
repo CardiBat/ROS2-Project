@@ -302,4 +302,25 @@ dpkg -l | grep <nome_pacchetto>
 
 Sostituendo `<nome_pacchetto>` con python3, git, cmake e build-essential. Notando la mancanza di rosdep, rosinstall-generator, wstool e rosinstall, essi saranno da installare nella directory corrente e da aggiungere al PATH.
 
+Installazione: 
+
+```sh
+pip3 install --user rosdep rosinstall-generator wstool rosinstall
+```
+Dove `--user` specifica la directory locale e non di sistema
+
+Impostazione di PATH:
+
+Dalla HOME (~) runnare `nano .bashrc` e aggiungere la seguente riga in fondo al file, che cerca in locale le directory dei pacchetti:
+
+```sh
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Salvare, chiudere nano e ricaricare bashrc con il seguente comando:
+
+```sh
+source ~/.bashrc
+```
+
 
