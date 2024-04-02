@@ -331,6 +331,84 @@ Per la compilazione di ROS, si utilizza normalmente `colcon` anche se non è det
 ```sh
 pip3 install --user -U colcon-common-extensions
 ```
-A questo punto
+
+A questo punto creare la workspace come già visto virtualmente:
+
+```sh
+mkdir -p ~/ros2_foxy_ws/src
+```
+```sh
+cd ~/ros2_foxy_ws
+```
+
+Installeremo quindi due pacchetti di prova per nodi semplici di esempio e personalizzazione solo in Python3.  
+
+File di configurazione:
+
+```sh
+rosinstall_generator rclpy example_interfaces --rosdistro foxy --deps --tar > foxy-custom.rosinstall
+```
+
+Scaricamento pacchetti:  
+
+```sh
+wstool init -j8 src foxy-custom.rosinstall
+```
+
+Ora bisogna procedere con l'installazione delle dipendenze che però possono dare problemi senza privilegi di root. Nonostante rosdep metta a disposizione il flag `--as-root=FALSE`, esso non funzionerà nel nostro caso. Dovremo quindi cercare manualmente e installare tramite pip --user (come fatto in precedenza) per risolvere i problemi di root. Spostiamoci in src della workspace e runniamo i seguenti comandi:
+
+```sh
+cat rclpy/package.xml
+cat example_interfaces/package.xml
+```
+
+e cerchiamo `depend` in ognuno di essi per individuare le dipendenze.
+
+Dipendenze di rclpy:
+
+- ament_cmake
+- python_cmake_module
+- rcutils
+- rmw_implementation_cmake
+- ament_index_python
+- builtin_interfaces
+- rcl
+- rcl_action
+- rcl_interfaces
+- rcl_yaml_param_parser
+- rosgraph_msgs
+- rpyutils
+- rmw_implementation
+- unique_identifier_msgs
+
+Dipendenze di example_interfaces:
+
+- ament_cmake
+- rosidl_default_generators
+- action_msgs
+- rosidl_default_runtime  
+
+Per procedere in modo isolato per evitare conflitti futuri nell'installazione delle dipendenze specifiche per ogni progetto, inizializzare un ambiente virtuale di python e attivarlo:
+
+```sh
+python3 -m venv ~/ros2_venv
+```
+
+```sh
+source ~/ros2_venv/bin/activate
+```
+
+Per disattivarlo, runnare semplicemente `deactivate`. Si scoprirà purtroppo che nessuna repo sarà scaricabile tramite python quindi saranno da clonare.
+
+Utilizzare questo comando per clonare la repo (con token generato da github), dopo essersi spostati in `~/ros2_foxy_ws/src`:
+
+```sh
+git clone https://<token>@github.com/ros2/rcl_interfaces.git
+```
+
+
+
+
+
 
 
