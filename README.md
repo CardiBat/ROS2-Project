@@ -322,5 +322,7 @@ Salvare, chiudere nano e ricaricare bashrc con il seguente comando:
 ```sh
 source ~/.bashrc
 ```
+Dopo un controllo generale con opzioni `--version` si noterà che tutto è stato installato completamente.
 
+### Cambiare directory per CMake
 
