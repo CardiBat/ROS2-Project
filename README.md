@@ -386,24 +386,26 @@ Dipendenze di example_interfaces:
 - ament_cmake
 - rosidl_default_generators
 - action_msgs
-- rosidl_default_runtime  
+- rosidl_default_runtime
 
-Per procedere in modo isolato per evitare conflitti futuri nell'installazione delle dipendenze specifiche per ogni progetto, inizializzare un ambiente virtuale di python e attivarlo:
-
-```sh
-python3 -m venv ~/ros2_venv
-```
+Per capire quali dipendenze esattamente manchino, serve utilizzare rosdep che però funziona solo con privilegi di root. per evitare che vada a cercare in cartelle su cui non ha il permesso, utilizzare questa serie di comandi:
 
 ```sh
-source ~/ros2_venv/bin/activate
+mkdir -p $HOME/.ros/rosdep/sources.list.d
+echo 'export ROSDEP_SOURCE_PATH="$HOME/.ros/rosdep/sources.list.d"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
-Per disattivarlo, runnare semplicemente `deactivate`. Si scoprirà purtroppo che nessuna repo sarà scaricabile tramite python quindi saranno da clonare.
+e quindi avviare rosdep:
+```sh
+rosdep init
+rosdep update
+``
 
 Utilizzare questo comando per clonare la repo (con token generato da github), dopo essersi spostati in `~/ros2_foxy_ws/src`:
 
 ```sh
-git clone https://<token>@github.com/ros2/rcl_interfaces.git
+git clone https://<token>@github.com/ros2/<package>.git
 ```
 
 
