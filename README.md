@@ -414,20 +414,23 @@ colcon build --symlink-install
 
 L'output infatti ci dice:
 
-18 packages finished [1min 37s]
-  1 package failed: osrf_testing_tools_cpp
-  3 packages aborted: ament_cmake_export_include_directories ament_lint_cmake ament_xmllint
-  10 packages had stderr output: ament_cmake_test ament_copyright ament_cppcheck ament_flake8 ament_lint ament_lint_cmake ament_package ament_pep257 fastcdr osrf_testing_tools_cpp
-  86 packages not processed
+18 packages finished [1min 37s]: 
+- 1 package failed: osrf_testing_tools_cpp
+- 3 packages aborted: ament_cmake_export_include_directories ament_lint_cmake ament_xmllint
+- 10 packages had stderr output: ament_cmake_test ament_copyright ament_cppcheck ament_flake8 ament_lint ament_lint_cmake ament_package ament_pep257 fastcdr osrf_testing_tools_cpp
+- 86 packages not processed
 
-
-
-Utilizzare questo comando per clonare la repo (con token generato da github), dopo essersi spostati in `~/ros2_foxy_ws/src`:
+La stessa situazione si presenta anche clonando manualmente ogni dipendenza tramite comando git (con token). Si rimane quindi bloccati in questa situazione poichè anche scaricando solo rlcpy (che ha sempre 100 dipendenze) la compilazione si blocca e non funziona compilare manualmente i pacchetti uno per uno perchè non si risolvono le dipendenze ugualmente. Qualsiasi nodo anche di prova dipende da rlcpp o rlcpy quindi non è comunque possibile alleggerire il carico di pacchetti. L'unica strada possibile senza l'uso di pacchetti precompilati è quella di evitare rlcpy/rlcpp usando ad esempio semplici scambi di messaggi es. HTTP o SOCKET quindi IPC (Internal Process Communication). 
 
 ```sh
 git clone https://<token>@github.com/ros2/<package>.git
 ```
 
+```sh
+cd rmw_implementation_cmake
+colcon build --packages-select rmw_implementation_cmake
+cd ..
+```
 
 
 
