@@ -458,6 +458,12 @@ rosdep install --from-paths src --ignore-src --rosdistro foxy -y
 colcon build --symlink-install
 ```
 
+Nel caso totale:
+```sh
+rosinstall_generator rclcpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
+```
+
+
 Errore che si presenta provando a compilare da solo osrf_testing_tools, l'unico che da problemi:
 
 ```
