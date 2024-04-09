@@ -273,6 +273,11 @@ salloc -n <> -t <hours:minutes:seconds> [-p <>] [-w <>] [--exclusive]
 srun -n <n_task_to_allocate> [-N <n_nodes_to_run> ] [-p <partitions>] [-w <specific_node>] [-t <hours:minutes:seconds>] [--pty] command
 ```
 
+Noi useremo il node-4 e quindi:
+```sh
+srun -n1 -c4 -w mcimone-node-4 --pty bash
+```
+
 Per una guida più approfondita, guardare la [guida specifico di CIMONE](https://gitlab.com/ecs-lab/courses/lab-of-big-data/riscv-hpc-perf/-/blob/main/2_slurm.md?ref_type=heads) oppure la [documentazione ufficiale](https://slurm.schedmd.com/overview.html)
 
 
