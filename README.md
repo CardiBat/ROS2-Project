@@ -209,6 +209,7 @@ source /opt/ros/foxy/setup.bash
 source ~/ros2_foxy_ws/install/local_setup.bash
 ```
 
+      |             ^~~~~~~~~~~~~~~~~~~~~
 Dopo aver apportato le modifiche, salvare il file e riavviare il terminale per assicurarsi che le modifiche abbiano effetto. Questo passaggio garantisce che l'ambiente del terminale sia privo di qualsiasi configurazione relativa a ROS, permettendo una nuova installazione o la configurazione di un ambiente differente in modo pulito e senza conflitti.
 
 
@@ -496,6 +497,8 @@ Summary: 0 packages finished [50.0s]
 
 
 ```
+
+~/ros2_foxy_ws/src/osrf_testing_tools_cpp/src/memory_tools/vendor/bombela/backward-cpp
 
 
 
