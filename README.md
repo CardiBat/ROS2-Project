@@ -542,3 +542,37 @@ colcon build --cmake-args -DCMAKE_CXX_FLAGS="-Wno-error -Wno-unused-variable -Wn
 nano src/osrf_testing_tools_cpp/src/memory_tools/vendor/bombela/backward-cpp/CMakeLists.txt
 
 
+cd google_benchmark_vendor/
+touch touch COLCON_IGNORE
+
+stderr: performance_test_fixture                                                                                                                                    
+CMake Error at CMakeLists.txt:20 (find_package):
+  By not providing "Findbenchmark.cmake" in CMAKE_MODULE_PATH this project
+  has asked CMake to find a package configuration file provided by
+  "benchmark", but CMake did not find one.
+
+  Could not find a package configuration file provided by "benchmark" with
+  any of the following names:
+
+    benchmarkConfig.cmake
+    benchmark-config.cmake
+
+  Add the installation prefix of "benchmark" to CMAKE_PREFIX_PATH or set
+  "benchmark_DIR" to a directory containing one of the above files.  If
+  "benchmark" provides a separate development package or SDK, be sure it has
+  been installed.
+
+
+---
+Failed   <<< performance_test_fixture [6.56s, exited with code 1]
+Aborted  <<< rosidl_generator_dds_idl [7.96s]                                                                                                                                      
+Aborted  <<< rosidl_typesupport_interface [1min 50s]                                                                                         
+Aborted  <<< fastrtps [16min 1s]                                             
+
+Summary: 60 packages finished [20min 13s]
+  1 package failed: performance_test_fixture
+  3 packages aborted: fastrtps rosidl_generator_dds_idl rosidl_typesupport_interface
+  23 packages had stderr output: ament_cmake ament_cmake_cppcheck ament_cmake_cpplint ament_cmake_flake8 ament_cmake_gmock ament_cmake_google_benchmark ament_cmake_gtest ament_cmake_pep257 ament_cmake_pytest ament_cmake_ros ament_cmake_uncrustify ament_cmake_xmllint ament_lint_auto ament_lint_common fastrtps foonathan_memory_vendor performance_test_fixture python_cmake_module rosidl_adapter rosidl_cmake rosidl_generator_dds_idl rosidl_parser test_interface_files
+  44 packages not processed
+
+
