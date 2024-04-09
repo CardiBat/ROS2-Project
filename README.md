@@ -441,6 +441,7 @@ Si rimane quindi bloccati in questa situazione poichè anche scaricando solo rlc
 
 Errore che si presenta provando a compilare da solo osrf_testing_tools:
 
+```
 Starting >>> osrf_testing_tools_cpp
 [Processing: osrf_testing_tools_cpp]                              
 --- stderr: osrf_testing_tools_cpp                               
@@ -494,7 +495,7 @@ Summary: 0 packages finished [50.0s]
   1 package had stderr output: osrf_testing_tools_cpp
 
 
-
+```
 
 
 
