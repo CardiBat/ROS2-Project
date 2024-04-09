@@ -443,7 +443,22 @@ cd ..
 
 Si rimane quindi bloccati in questa situazione poichè anche scaricando solo rlcpy (che ha sempre 100 dipendenze) la compilazione si blocca e non funziona compilare manualmente i pacchetti uno per uno perchè non si risolvono le dipendenze ugualmente. Qualsiasi nodo anche di prova dipende da rlcpp o rlcpy quindi non è comunque possibile alleggerire il carico di pacchetti. L'unica strada possibile senza l'uso di pacchetti precompilati è quella di evitare rlcpy/rlcpp usando ad esempio semplici scambi di messaggi es. HTTP o SOCKET quindi IPC (Internal Process Communication).  
 
-Errore che si presenta provando a compilare da solo osrf_testing_tools:
+Riassumendo, per installare un pacchetto basta fare:
+
+```sh
+rosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
+```
+```sh
+wstool init -j8 src foxy-custom.rosinstall
+```
+```sh
+rosdep install --from-paths src --ignore-src --rosdistro foxy -y
+```
+```sh
+colcon build --symlink-install
+```
+
+Errore che si presenta provando a compilare da solo osrf_testing_tools, l'unico che da problemi:
 
 ```
 Starting >>> osrf_testing_tools_cpp
@@ -501,17 +516,23 @@ Summary: 0 packages finished [50.0s]
 
 ```
 
+
+
+
+Si procede quindi a ignorare i warning e a sopprimere da txt quelli dell'architettura:
+
+```sh
+nano src/osrf_testing_tools_cpp/src/memory_tools/vendor/bombela/backward-cpp/backward.hpp
+```
+
+rimuovere quindi `#warning ":/ sorry, ain't know no nothing none not of your architecture!"` e runnare:
+
+```sh
+colcon build --cmake-args -DCMAKE_CXX_FLAGS="-Wno-error -Wno-unused-variable -Wno-maybe-uninitialized -Wno-error=cpp -Wno-error=pedantic"
+```
+
+
 ~/ros2_foxy_ws/src/osrf_testing_tools_cpp/src/memory_tools/vendor/bombela/backward-cpp
+nano src/osrf_testing_tools_cpp/src/memory_tools/vendor/bombela/backward-cpp/CMakeLists.txt
 
 
-1)
-rosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
-
-2)
-wstool init -j8 src foxy-custom.rosinstall
-
-3))
-rosdep install --from-paths src --ignore-src --rosdistro foxy -y
-
-4) 
-colcon build --symlink-install
