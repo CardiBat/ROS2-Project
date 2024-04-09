@@ -71,7 +71,8 @@ sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils vir
 Occorre inoltre aggiungersi ai gruppi opportuni per evitare problemi:
 
 ```sh
-sudo adduser `id -un` libvirt
+sudo adduser `id -un` libvirtrosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
+
 ```
 ```sh
 sudo adduser `id -un` kvm
@@ -198,7 +199,8 @@ Aprire il file di configurazione della shell con un editor di testo:
 
 ```sh
 nano ~/.bashrc  # oppure utilizzare ~/.zshrc per zsh
-```
+```rosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
+
 
 Ricercare e rimuovere le linee associate all'ambiente ROS 2, che potrebbero apparire come:
 
@@ -360,6 +362,7 @@ Scaricamento pacchetti:
 ```sh
 wstool init -j8 src foxy-custom.rosinstall
 ```
+rosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
 
 Ora bisogna procedere con l'installazione delle dipendenze che però possono dare problemi senza privilegi di root. Nonostante rosdep metta a disposizione il flag `--as-root=FALSE`, esso non funzionerà nel nostro caso. Dovremo quindi cercare manualmente e installare tramite pip --user (come fatto in precedenza) per risolvere i problemi di root. Spostiamoci in src della workspace e runniamo i seguenti comandi:
 
@@ -501,6 +504,14 @@ Summary: 0 packages finished [50.0s]
 ~/ros2_foxy_ws/src/osrf_testing_tools_cpp/src/memory_tools/vendor/bombela/backward-cpp
 
 
+1)
+rosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
 
+2)
+wstool init -j8 src foxy-custom.rosinstall
 
+3))
+rosdep install --from-paths src --ignore-src --rosdistro foxy -y
 
+4) 
+colcon build --symlink-install
