@@ -597,11 +597,31 @@ make
 make install
 ```
 
-A questo punto, però, si presenta un errore importante durante la compilazione:
+A questo punto, però, si presenta un errore importante durante la compilazione (dato dal pacchetto `mimick`):
 ```
 CMake Error at CMakeLists.txt:88 (message):
   Architecture 'riscv64' is not supported.
 ```
+
+Per fortuna, questo pacchetto non è essenziale per la costruzione dei nodi bensì in ambito di simulazione e quindi, può essere ignorato tramite la modifica del comando di compilazione (da qui in avanti):
+
+```sh
+colcon build --packages-skip mimick_vendor
+```
+
+Ovviamente vi sono altri pacchetti che dipendono da `mimick_vendor` e per ognuno bisogna entrare nel suo file di configurazione CMakeLists.txt e ignorarne la dipendenza. Vediamo un esempio per rcutils:
+
+```sh
+cd src/rcutils && nano CMakeLists.txt
+```
+
+e commentare la riga find_package(mimick_vendor REQUIRED) tramite `#`.  
+
+Purtroppo però le dipendenze di questo pacchetto si presentano in molti file che lo utilizzano per testing. Dopo una ricerca, il comando per evitare ciò diventa:
+
+colcon build --packages-skip mimick_vendor --cmake-args -DBUILD_TESTING=OFF
+
+Ora però un pacchetto chiamato `rmw_fastrtps_shared_cpp` blocca la compilazione in loop al 28% (anche dopo 2h di attesa) senza però notificare errori. Per un debugging appropriato, conviene utilizzare un flag apposito per colcon:
 
 
 
