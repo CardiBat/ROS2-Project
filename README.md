@@ -441,9 +441,11 @@ colcon build --packages-select rmw_implementation_cmake
 cd ..
 ```
 
-Si rimane quindi bloccati in questa situazione poichè anche scaricando solo rlcpy (che ha sempre 100 dipendenze) la compilazione si blocca e non funziona compilare manualmente i pacchetti uno per uno perchè non si risolvono le dipendenze ugualmente. Qualsiasi nodo anche di prova dipende da rlcpp o rlcpy quindi non è comunque possibile alleggerire il carico di pacchetti. L'unica strada possibile senza l'uso di pacchetti precompilati è quella di evitare rlcpy/rlcpp usando ad esempio semplici scambi di messaggi es. HTTP o SOCKET quindi IPC (Internal Process Communication).  
+Si rimane quindi bloccati in questa situazione poichè anche scaricando solo rlcpy (che ha sempre 100 dipendenze) la compilazione si blocca e non funziona compilare manualmente i pacchetti uno per uno perchè non si risolvono le dipendenze ugualmente. Qualsiasi nodo anche di prova dipende da rlcpp o rlcpy quindi non è comunque possibile alleggerire il carico di pacchetti.  
 
-Riassumendo, per installare un pacchetto basta fare:
+Le uniche strade possibili senza l'uso di pacchetti precompilati sono quelle di evitare rlcpy/rlcpp usando ad esempio semplici scambi di messaggi es. HTTP o SOCKET quindi IPC (Internal Process Communication) OPPURE cambiando l'approccio del compilatore in modo manuale per ogni pacchetto che va in errore. Quest'ultima sarà la strada che sceglieremo da qui in avanti.
+
+Intanto, per ricordarlo, per installare un pacchetto basta fare:
 
 ```sh
 rosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
@@ -464,7 +466,7 @@ rosinstall_generator rclcpp --rosdistro foxy --deps --tar > foxy-custom.rosinsta
 ```
 
 
-Errore che si presenta provando a compilare da solo osrf_testing_tools, l'unico che da problemi:
+Errore che si presenta provando a compilare da solo osrf_testing_tools, uno dei pacchetti che fallisce:
 
 ```
 Starting >>> osrf_testing_tools_cpp
@@ -523,9 +525,7 @@ Summary: 0 packages finished [50.0s]
 ```
 
 
-
-
-Si procede quindi a ignorare i warning e a sopprimere da txt quelli dell'architettura:
+Si procede quindi a ignorare i warning e a sopprimere da txt quelli dell'architettura. _Si farà lo stesso per gli altri pacchetti a seguire prestando attenzione a non compromettere il pacchetto_.:
 
 ```sh
 nano src/osrf_testing_tools_cpp/src/memory_tools/vendor/bombela/backward-cpp/backward.hpp
@@ -537,15 +537,9 @@ rimuovere quindi `#warning ":/ sorry, ain't know no nothing none not of your arc
 colcon build --cmake-args -DCMAKE_CXX_FLAGS="-Wno-error -Wno-unused-variable -Wno-maybe-uninitialized -Wno-error=cpp -Wno-error=pedantic"
 ```
 
+Procedendo, purtroppo vi sono altri errori per molti pacchetti, tutti dovuti alla mancanza di un pacchetto 'benchmark'.
 
-~/ros2_foxy_ws/src/osrf_testing_tools_cpp/src/memory_tools/vendor/bombela/backward-cpp
-nano src/osrf_testing_tools_cpp/src/memory_tools/vendor/bombela/backward-cpp/CMakeLists.txt
-
-
-cd google_benchmark_vendor/
-touch touch COLCON_IGNORE
-
-stderr: performance_test_fixture                                                                                                                                    
+```
 CMake Error at CMakeLists.txt:20 (find_package):
   By not providing "Findbenchmark.cmake" in CMAKE_MODULE_PATH this project
   has asked CMake to find a package configuration file provided by
@@ -574,5 +568,46 @@ Summary: 60 packages finished [20min 13s]
   3 packages aborted: fastrtps rosidl_generator_dds_idl rosidl_typesupport_interface
   23 packages had stderr output: ament_cmake ament_cmake_cppcheck ament_cmake_cpplint ament_cmake_flake8 ament_cmake_gmock ament_cmake_google_benchmark ament_cmake_gtest ament_cmake_pep257 ament_cmake_pytest ament_cmake_ros ament_cmake_uncrustify ament_cmake_xmllint ament_lint_auto ament_lint_common fastrtps foonathan_memory_vendor performance_test_fixture python_cmake_module rosidl_adapter rosidl_cmake rosidl_generator_dds_idl rosidl_parser test_interface_files
   44 packages not processed
+```
+
+Ricordando che non si hanno privilegi di root, si procederà quindi in questo modo:  
+
+Clonare la repo in locale per evitare il comando `sudo`
+```sh
+git clone https://github.com/google/benchmark.git
+```
+```sh
+cd benchmark
+```
+```sh
+mkdir build
+```
+```sh
+cd build
+```
+Disabilitare i test di Google per evitare errori inattesi:
+```sh
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/local -DBENCHMARK_ENABLE_TESTING=OFF ..
+```
+Procedere con l'installazione
+```sh
+make
+```
+```sh
+make install
+```
+
+A questo punto, però, si presenta un errore importante durante la compilazione:
+```
+CMake Error at CMakeLists.txt:88 (message):
+  Architecture 'riscv64' is not supported.
+```
+
+
+
+
+
+
+
 
 
