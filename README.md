@@ -276,9 +276,9 @@ salloc -n <> -t <hours:minutes:seconds> [-p <>] [-w <>] [--exclusive]
 srun -n <n_task_to_allocate> [-N <n_nodes_to_run> ] [-p <partitions>] [-w <specific_node>] [-t <hours:minutes:seconds>] [--pty] command
 ```
 
-Noi useremo il node-4 e quindi:
+Noi useremo il node-3 e quindi runniamo lo stesso task su 4 core:
 ```sh
-srun -n1 -c4 -w mcimone-node-4 --pty bash
+srun -n4 -c1 -w mcimone-node-3 --pty bash
 ```
 
 Per una guida più approfondita, guardare la [guida specifico di CIMONE](https://gitlab.com/ecs-lab/courses/lab-of-big-data/riscv-hpc-perf/-/blob/main/2_slurm.md?ref_type=heads) oppure la [documentazione ufficiale](https://slurm.schedmd.com/overview.html)
@@ -619,7 +619,9 @@ e commentare la riga find_package(mimick_vendor REQUIRED) tramite `#`.
 
 Purtroppo però le dipendenze di questo pacchetto si presentano in molti file che lo utilizzano per testing. Dopo una ricerca, il comando per evitare ciò diventa:
 
+```sh
 colcon build --packages-skip mimick_vendor --cmake-args -DBUILD_TESTING=OFF
+```
 
 Ora però un pacchetto chiamato `rmw_fastrtps_shared_cpp` blocca la compilazione in loop al 28% (anche dopo 2h di attesa) senza però notificare errori. Per un debugging appropriato, conviene utilizzare un flag apposito per colcon:
 
