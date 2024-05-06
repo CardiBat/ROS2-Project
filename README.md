@@ -623,9 +623,112 @@ Purtroppo però le dipendenze di questo pacchetto si presentano in molti file ch
 colcon build --packages-skip mimick_vendor --cmake-args -DBUILD_TESTING=OFF
 ```
 
-Ora però un pacchetto chiamato `rmw_fastrtps_shared_cpp` blocca la compilazione in loop al 28% (anche dopo 2h di attesa) senza però notificare errori. Per un debugging appropriato, conviene utilizzare un flag apposito per colcon:
+A questo punto la compilazione prosegue fino al pacchetto finale di installazione rclpp che però va in errore in questo modo:
+
+```
+
+[Processing: rclcpp]                                             
+--- stderr: rclcpp                                              
+/home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/src/rclcpp/executor.cpp: In member function ‘bool rclcpp::Executor::get_next_ready_executable(rclcpp::AnyExecutable&)’:
+/home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/src/rclcpp/executor.cpp:615:67: warning: ‘using CallbackGroupType = enum class rclcpp::CallbackGroupType’ is deprecated: use rclcpp::CallbackGroupType instead [-Wdeprecated-declarations]
+  615 |       any_executable.callback_group->type() == CallbackGroupType::MutuallyExclusive)
+      |                                                                   ^~~~~~~~~~~~~~~~~
+In file included from /home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/include/rclcpp/any_executable.hpp:20,
+                 from /home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/include/rclcpp/memory_strategy.hpp:24,
+                 from /home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/include/rclcpp/memory_strategies.hpp:18,
+                 from /home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/include/rclcpp/executor_options.hpp:20,
+                 from /home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/include/rclcpp/executor.hpp:33,
+                 from /home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/src/rclcpp/executor.cpp:24:
+/home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/include/rclcpp/callback_group.hpp:165:7: note: declared here
+  165 | using CallbackGroupType [[deprecated("use rclcpp::CallbackGroupType instead")]] = CallbackGroupType;
+      |       ^~~~~~~~~~~~~~~~~
+/home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/src/rclcpp/parameter_value.cpp: In instantiation of ‘std::string array_to_string(const std::vector<ValType>&, std::ios_base::fmtflags) [with ValType = std::__cxx11::basic_string<char>; PrintType = std::__cxx11::basic_string<char>; std::string = std::__cxx11::basic_string<char>; std::ios_base::fmtflags = std::ios_base::fmtflags]’:
+/home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/src/rclcpp/parameter_value.cpp:105:29:   required from here
+/home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/src/rclcpp/parameter_value.cpp:70:22: warning: loop variable ‘value’ creates a copy from type ‘const std::__cxx11::basic_string<char>’ [-Wrange-loop-construct]
+   70 |   for (const ValType value : array) {
+      |                      ^~~~~
+/home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/src/rclcpp/parameter_value.cpp:70:22: note: use reference type to prevent copying
+   70 |   for (const ValType value : array) {
+      |                      ^~~~~
+      |                      &
+---
+Finished <<< rclcpp [5min 5s]
+                               
+Summary: 107 packages finished [14min 2s]
+  1 package had stderr output: rclcpp
 
 
+```
+
+Esaminando lo stderr, notiamo che abbiamo due warning:
+- Un warning relativo a una dichiarazione deprecata che andrebbe aggiornata, ma non è un grosso problema
+- Un warning relativo a un ciclo di while che abbassa la performance, ma anche qui non ci interessa
+Di conseguenza il pacchetto è quindi stato compilato completamente e si può procedere con la demo sui nodi.
+
+
+Impostiamo quindi le variabili d'ambiente di tutti:
+
+```sh
+export CPLUS_INCLUDE_PATH=$(find /home/fsimoni/ros2_foxy_ws/install -type d -name include | paste -sd ":" -):${CPLUS_INCLUDE_PATH}
+
+export LD_LIBRARY_PATH=$(find /home/fsimoni/ros2_foxy_ws/install -type d -name lib | paste -sd ":" -):${LD_LIBRARY_PATH}
+```
+
+Spostiamoci in src e creiamo il nostro pacchetto:
+
+```sh
+cd /path/to/ros2_foxy_ws/src
+mkdir my_package
+cd my_package
+```
+
+Creiamo un file di main.cpp:
+```sh
+nano main.cpp
+```
+
+Scriviamo un semplice nodo di prova:
+
+```
+#include "rclcpp/rclcpp.hpp"
+
+class MyNode : public rclcpp::Node
+{
+public:
+  MyNode() : Node("my_node") {
+    RCLCPP_INFO(this->get_logger(), "Hello from my_node!");
+  }
+};
+
+int main(int argc, char * argv[])
+{
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<MyNode>();
+  rclcpp::spin(node);
+  rclcpp::shutdown();
+  return 0;
+}
+```
+
+Salviamolo e compiliamolo singolarmente, dal root del progetto:
+
+```sh
+g++ -o my_node src/my_package/main.cpp \
+-I/home/fsimoni/ros2_foxy_ws/install/rclcpp/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rcutils/include \
+/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib/librclcpp.so \
+/home/fsimoni/ros2_foxy_ws/install/rcutils/lib/librcutils.so \
+-lstdc++fs -pthread
+```
+
+Verrà quindi creato un eseguibile chiamato my_node. Runniamolo con:
+
+```sh
+./my_node
+```
+Il nodo funziona e stampa a terminale:
+
+![image](https://github.com/CardiBat/ROS2-Project/assets/102695322/10902e5a-8931-4e3d-a73d-ae099687105f)
 
 
 
