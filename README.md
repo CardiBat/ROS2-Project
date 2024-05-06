@@ -789,6 +789,8 @@ E runniamo:
 ./my_node_2
 ```
 
+Ad output quindi si mostra un nodo in grado di poter operare altro nel mentre:
+![image](https://github.com/CardiBat/ROS2-Project/assets/102695322/7c671563-f673-40ef-970f-37fd4a219abd)
 
 
 Il motivo per il quale ad ogni run aggiungo le librerie necessarie:
