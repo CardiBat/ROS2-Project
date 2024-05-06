@@ -730,8 +730,68 @@ Il nodo funziona e stampa a terminale:
 
 ![image](https://github.com/CardiBat/ROS2-Project/assets/102695322/10902e5a-8931-4e3d-a73d-ae099687105f)
 
+Per sicurezza, effettuiamo un backup:
+
+```sh
+scp -r fsimoni@mcimone-node-4:/home/fsimoni/ros2_foxy_ws /home/cardigun/Scrivania/backup-riscv
+```
+
+Creiamo un altro nodo di esempio. Creiamo quindi un `my_package_2` in `src` e dentro creo un altro nodo così composto:
+
+```
+#include "rclcpp/rclcpp.hpp"
+
+class MyNode2 : public rclcpp::Node
+{
+public:
+  MyNode2() : Node("my_node_2") {
+    // Do something different here
+    timer_ = this->create_wall_timer(std::chrono::seconds(1), std::bind(&MyNode2::timerCallback, this));
+    RCLCPP_INFO(this->get_logger(), "Hello from my_node_2!");
+  }
+
+private:
+  void timerCallback() {
+    // Perform some action periodically
+    RCLCPP_INFO(this->get_logger(), "Doing something different...");
+  }
+
+  rclcpp::TimerBase::SharedPtr timer_;
+};
+
+int main(int argc, char * argv[])
+{
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<MyNode2>();
+  rclcpp::spin(node);
+  rclcpp::shutdown();
+  return 0;
+}
+
+```
+
+Compiliamo quindi così:
+
+```sh
+g++ -o my_node_2 src/my_package_2/main.cpp \
+-I/home/fsimoni/ros2_foxy_ws/install/rclcpp/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rcutils/include \
+/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib/librclcpp.so \
+/home/fsimoni/ros2_foxy_ws/install/rcutils/lib/librcutils.so \
+/home/fsimoni/ros2_foxy_ws/install/rcl/lib/librcl.so \
+/home/fsimoni/ros2_foxy_ws/install/tracetools/lib/libtracetools.so \
+-lstdc++fs -pthread
+```
+
+E runniamo:
+
+```sh
+./my_node_2
+```
 
 
+
+Il motivo per il quale ad ogni run aggiungo le librerie necessarie:
 
 
 
