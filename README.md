@@ -48,7 +48,7 @@ Un esempio di come questo possa essere implementato può essere osservato sempre
 ## Compilazione e Installazione
 
 Normalmente, l'installazione (su Ubuntu) prevedere un semplice comando da terminale e l'installazione viene completata automaticamente. Nel nostro caso, però, si cercherà di compilare manualmente l'insieme di file per snellire il più possibile l'installazione e facilitarne il porting su un'architettura RISC-V (nonostante ROS sia progettato per architetture Intel)  
-Quindi, si procederà alla creazione di un ambiente virtuale che consenta (nel caso di errori irreversibili) di non danneggiare il sistema e di conseguenza che si possano provare varie combinazioni di compilazione.  
+Quindi, partiremo in ispezione su ambiente virtuale che consenta (nel caso di errori irreversibili) di non danneggiare il sistema e di conseguenza che si possano provare varie combinazioni di compilazione. Questo passo è fondamentale per capire come muoverci agilmente quando poi ci sposteremo su RISC-V.
 
 ### Installazione di un ambiente virtuale
 
@@ -85,12 +85,12 @@ Lanciare quindi il seguente comando:
 virt-manager
 ```
 
-e installare il sistema operativo da file ISO scaricato dal sito ufficiale.
+e installare il sistema operativo da file ISO scaricato dal sito Ubuntu ufficiale.
 
 
 ### Installazione delle librerie e dipendenze richieste da ROS2 Foxy
 
-Sarà opportuno installare i compilatori e le librerie Python richieste, oltre a python se non è installato sulla propria macchina. Eseguire quindi i seguenti comandi:
+Sarà opportuno installare i compilatori e le librerie Python richieste, oltre a Python se non è installato sulla propria macchina. Eseguire quindi i seguenti comandi:
 
 ```sh
 sudo apt update
@@ -99,7 +99,7 @@ sudo apt update
 sudo apt install build-essential cmake git python3-rosdep python3-rosinstall-generator python3-wstool python3-rosinstall
 ```
 
-Nel caso non fosse installato, installare python:
+Nel caso quindi non fosse installato, per python eseguire:
 
 ```sh
 sudo apt update
@@ -153,7 +153,7 @@ L'utilizzo di `rosinstall_generator` permette di selezionare specifiche parti di
 ```sh
 rosinstall_generator [PKGNAME] --rosdistro foxy --deps --tar > foxy-desktop.rosinstall
 ```
-Un esempio potrebbe essere considerare pacchetti come rclcpp per la programmazione client in C++, rclpy per la programmazione client in Python, e example_interfaces che fornisce esempi di interfacce di servizio e messaggi che potrebbero essere utilizzati per esperimenti e apprendimento.
+Un esempio potrebbe essere considerare pacchetti come rclcpp per la programmazione di nodi in C++, rclpy per la programmazione di nodi in Python, e example_interfaces che fornisce esempi di interfacce di servizio e messaggi che potrebbero essere utilizzati per esperimenti e apprendimento.
 
 ```sh
 rosinstall_generator rclcpp rclpy example_interfaces --rosdistro foxy --deps --tar > foxy-desktop.rosinstall
@@ -191,16 +191,14 @@ rm -rf build install log
 ```
 Questo rimuoverà tutte le directory relative alla compilazione e all'installazione dei pacchetti ROS 2.
 
-
-
-Per riconfigurare l'ambiente di sviluppo da uno stato pulito, è opportuno rimuovere eventuali riferimenti residui a ROS 2 presenti nel file di configurazione della shell, come `.bashrc` o `.zshrc`, a seconda della shell in uso. Questi riferimenti possono includere l'aggiunta del percorso di installazione di ROS 2 al `PATH`, nonché il sourcing di script di setup.
+Per riconfigurare l'ambiente di sviluppo da uno stato pulito, è opportuno anche rimuovere eventuali riferimenti residui a ROS 2 presenti nel file di configurazione della shell, come `.bashrc` o `.zshrc`, a seconda della shell in uso. Questi riferimenti possono includere l'aggiunta del percorso di installazione di ROS 2 al `PATH`, nonché il sourcing di script di setup.
 
 Aprire il file di configurazione della shell con un editor di testo:
 
 ```sh
 nano ~/.bashrc  # oppure utilizzare ~/.zshrc per zsh
-```rosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
-
+rosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
+```
 
 Ricercare e rimuovere le linee associate all'ambiente ROS 2, che potrebbero apparire come:
 
@@ -211,11 +209,14 @@ source /opt/ros/foxy/setup.bash
 source ~/ros2_foxy_ws/install/local_setup.bash
 ```
 
-      |             ^~~~~~~~~~~~~~~~~~~~~
 Dopo aver apportato le modifiche, salvare il file e riavviare il terminale per assicurarsi che le modifiche abbiano effetto. Questo passaggio garantisce che l'ambiente del terminale sia privo di qualsiasi configurazione relativa a ROS, permettendo una nuova installazione o la configurazione di un ambiente differente in modo pulito e senza conflitti.
 
 
 ## Verso il porting su RISC-V: Utilizzo del cluster Monte Cimone
+
+Dopo aver ben chiaro il funzionamento di ROS su una macchina Ubuntu, ora si cercherà di seguire questi passaggi adattandosi alla macchina obiettivo, in questo caso basata su RISC-V. Si incontreranno diversi problemi, dal momento che non è supportata nativamente e quindi vi saranno da fare diversi interventi a livello di compilazione. Bisognerà quindi cercare di ignorare passaggi non fondamentali e di scendere a basso livello se alcuni comandi come rosdep o colcon potessero non funzionare. 
+
+Prima di cominciare, è opportuno imparare a orientarsi con facilità all'interno della macchina RISC-V denominata Monte-Cimone. I prossimi passaggi si occuperanno di chiarire il più possibile le operazioni principali. 
 
 ### Collegamento e Login 
 
@@ -227,7 +228,7 @@ ssh username@beta.dei.unibo.it -p 2223
 > output: username@mcimone-login:~$ 
 
 
-Dopo aver inserito la password fornita dal docente, cambierà il proprio username dal terminale e verrà stampato il comando di `nodeinfo` (richiamabile anche successivamente per avere informazioni in tempo reale). La schermata mostrerà quindi tutti i nodi (disponibili se e solo se sono in stato di `IDLE`):  
+Dopo aver inserito la password fornita dal docente, cambierà il proprio username dal terminale e verrà stampato il comando di `nodeinfo` (richiamabile anche successivamente per avere informazioni in tempo reale dal `login`). La schermata mostrerà quindi tutti i nodi (disponibili _se e solo se_ sono in stato di `IDLE`):  
 
 <p>&nbsp;</p>
 <div align="center">
@@ -235,7 +236,7 @@ Dopo aver inserito la password fornita dal docente, cambierà il proprio usernam
 </div>
 <p>&nbsp;</p>
 
-NOTA IMPORTANTE: Il login è basato su architettura Intel (e quindi CISC). Sarà quindi opportuno proseguire collegandosi a un nodo per raggiungere effettivamente l'architettura RISC-V
+NOTA IMPORTANTE: Il login è basato su architettura Intel (e quindi CISC). Sarà quindi opportuno proseguire collegandosi a un nodo per raggiungere effettivamente l'architettura RISC-V.
 
 
 
@@ -276,16 +277,16 @@ salloc -n <> -t <hours:minutes:seconds> [-p <>] [-w <>] [--exclusive]
 srun -n <n_task_to_allocate> [-N <n_nodes_to_run> ] [-p <partitions>] [-w <specific_node>] [-t <hours:minutes:seconds>] [--pty] command
 ```
 
-Noi useremo il node-3 e quindi runniamo lo stesso task su 4 core:
+Noi useremo il node-4 e quindi runniamo lo stesso task su 4 core:
 ```sh
-srun -n4 -c1 -w mcimone-node-3 --pty bash
+srun -n4 -c1 -w mcimone-node-4 --pty bash
 ```
 
-Per una guida più approfondita, guardare la [guida specifico di CIMONE](https://gitlab.com/ecs-lab/courses/lab-of-big-data/riscv-hpc-perf/-/blob/main/2_slurm.md?ref_type=heads) oppure la [documentazione ufficiale](https://slurm.schedmd.com/overview.html)
+Per una guida più approfondita, guardare la [guida specifica di CIMONE](https://gitlab.com/ecs-lab/courses/lab-of-big-data/riscv-hpc-perf/-/blob/main/2_slurm.md?ref_type=heads) oppure la [documentazione ufficiale](https://slurm.schedmd.com/overview.html)
 
 
 
-### Installare le dipendenze sulla macchina RISC-V
+### Ispezione delle dipendenze base sulla macchina RISC-V
 
 Riassumendo, le dipendenze necessarie per ROS2 sono:  
 
@@ -300,7 +301,7 @@ Riassumendo, le dipendenze necessarie per ROS2 sono:
 - python3-rosinstall  
 
 Bisogna quindi verificarne la presenza sulla macchina RISC-V, eventualmente installarle e a questo punto si potrà procedere con il porting.  
-_Nota importante_: Non si hanno privilegi di root per installare programmi sulla macchina che si usa, perciò eventuali programmi saranno da installare sulla propria directory Desktop e dovrà quindi essere aggiornata la variabile d'ambiente PATH
+_Nota importante_: Non si hanno privilegi di root per installare programmi sulla macchina che si usa, perciò eventuali programmi saranno da installare sulla propria directory Desktop da _Sorgente_ e dovrà quindi essere aggiornata la variabile d'ambiente PATH per ognuno di essi (oppure si può richiedere all'amministratore in alcuni casi).
 
 Runniamo il seguente comando:
 
@@ -332,15 +333,18 @@ source ~/.bashrc
 ```
 Dopo un controllo generale con opzioni `--version` si noterà che tutto è stato installato completamente.
 
-### Prove di compilazione
 
-Per la compilazione di ROS, si utilizza normalmente `colcon` anche se non è detto che funzioni su RISC-V. Proveremo comunque a utilizzarlo installandolo con questo comando:
+## Prove di compilazione di ROS su RISC-V
+
+Siamo arrivati al cuore del progetto: il porting di un sistema operativo non compatibile con RISC. Sarà necessario muoversi con cautela stando attenti alle installazioni, ai conflitti e alle dipendenze. Inoltre, bisognerà essere in grado di trovare alternative qualora non funzionasse qualche soluzione. 
+
+Innanzitutto, per la compilazione di ROS, si utilizza normalmente `colcon` anche se non è detto che funzioni su RISC-V. Proveremo comunque a utilizzarlo installandolo con questo comando (sempre nella directory dell'utente):
 
 ```sh
 pip3 install --user -U colcon-common-extensions
 ```
 
-A questo punto creare la workspace come già visto virtualmente:
+A questo punto creare la workspace come già visto virtualmente su CISC:
 
 ```sh
 mkdir -p ~/ros2_foxy_ws/src
@@ -349,7 +353,10 @@ mkdir -p ~/ros2_foxy_ws/src
 cd ~/ros2_foxy_ws
 ```
 
-Installeremo quindi due pacchetti di prova per nodi semplici di esempio e personalizzazione solo in Python3.  
+### [FAIL] Prova di compilazione sui pacchetti principali
+
+
+Proveremo quindi ad installare due pacchetti di prova per nodi semplici di esempio e personalizzazione solo in Python3.  
 
 File di configurazione:
 
@@ -362,7 +369,6 @@ Scaricamento pacchetti:
 ```sh
 wstool init -j8 src foxy-custom.rosinstall
 ```
-rosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
 
 Ora bisogna procedere con l'installazione delle dipendenze che però possono dare problemi senza privilegi di root. Nonostante rosdep metta a disposizione il flag `--as-root=FALSE`, esso non funzionerà nel nostro caso. Dovremo quindi cercare manualmente e installare tramite pip --user (come fatto in precedenza) per risolvere i problemi di root. Spostiamoci in src della workspace e runniamo i seguenti comandi:
 
@@ -397,7 +403,7 @@ Dipendenze di example_interfaces:
 - action_msgs
 - rosidl_default_runtime
 
-Per capire quali dipendenze esattamente manchino, serve utilizzare rosdep che però funziona solo con privilegi di root. per evitare che vada a cercare in cartelle su cui non ha il permesso, utilizzare questa serie di comandi:
+Per capire quali dipendenze esattamente manchino, serve utilizzare rosdep che però funziona solo con privilegi di root poichè cerca in tutte le cartelle, anche quelle di admin. Per evitare che vada a cercare in cartelle su cui non ha il permesso, utilizzare questa serie di comandi:
 
 ```sh
 mkdir -p $HOME/.ros/rosdep/sources.list.d
