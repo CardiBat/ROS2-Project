@@ -353,7 +353,7 @@ mkdir -p ~/ros2_foxy_ws/src
 cd ~/ros2_foxy_ws
 ```
 
-### [FAIL] Prova di compilazione sui pacchetti principali
+### [FAIL] Prova di compilazione sui pacchetti principali ed esposizione dei problemi
 
 
 Proveremo quindi ad installare due pacchetti di prova per nodi semplici di esempio e personalizzazione solo in Python3.  
@@ -429,11 +429,13 @@ colcon build --symlink-install
 
 L'output infatti ci dice:
 
+```
 18 packages finished [1min 37s]: 
 - 1 package failed: osrf_testing_tools_cpp
 - 3 packages aborted: ament_cmake_export_include_directories ament_lint_cmake ament_xmllint
 - 10 packages had stderr output: ament_cmake_test ament_copyright ament_cppcheck ament_flake8 ament_lint ament_lint_cmake ament_package ament_pep257 fastcdr osrf_testing_tools_cpp
 - 86 packages not processed
+```
 
 La stessa situazione si presenta anche clonando manualmente ogni dipendenza tramite comando git (con token). 
 
@@ -447,14 +449,29 @@ colcon build --packages-select rmw_implementation_cmake
 cd ..
 ```
 
-Si rimane quindi bloccati in questa situazione poichè anche scaricando solo rlcpy (che ha sempre 100 dipendenze) la compilazione si blocca e non funziona compilare manualmente i pacchetti uno per uno perchè non si risolvono le dipendenze ugualmente. Qualsiasi nodo anche di prova dipende da rlcpp o rlcpy quindi non è comunque possibile alleggerire il carico di pacchetti.  
+Si rimane quindi bloccati in questa situazione poichè anche scaricando solo rlcpy (che ha sempre più di 100 dipendenze) la compilazione si blocca e non funziona compilare manualmente i pacchetti uno per uno perchè non si risolvono le dipendenze ugualmente. Qualsiasi nodo anche di prova dipende da rlcpp o rlcpy quindi non è comunque possibile alleggerire il carico di pacchetti che si aggira sempre sui 100.
 
-Le uniche strade possibili senza l'uso di pacchetti precompilati sono quelle di evitare rlcpy/rlcpp usando ad esempio semplici scambi di messaggi es. HTTP o SOCKET quindi IPC (Internal Process Communication) OPPURE cambiando l'approccio del compilatore in modo manuale per ogni pacchetto che va in errore. Quest'ultima sarà la strada che sceglieremo da qui in avanti.
+### Possibili soluzioni e scelta della più efficace
 
-Intanto, per ricordarlo, per installare un pacchetto basta fare:
+Vi sono 3 possibili soluzioni a questi problemi:
+
+- Uso di pacchetti precompilati
+- Evitare rlcpy/rlcpp usando ad esempio pacchetti semplici di scambi di messaggi come HTTP o SOCKET quindi IPC (Internal Process Communication)
+- Cambiare l'approccio del compilatore in modo manuale per ogni pacchetto che va in errore.
+
+Le prime due sono poco interessanti per il nostro progetto. Noi vogliamo capire come compilare qualsiasi pacchetto (sempre se possibile) evitando errori intrinsechi di architettura che potrebbero trattarsi solo di semplici controlli e non di effettivo non funzionamento. *_Eviteremo quindi eventuali pacchetti di simulazione, controllo o test nel caso essi non ci permettano di proseguire_*.
+
+Proseguiremo quindi scendendo a basso livello cambiando i file di CMAKE forzando la compilazione in tutti i casi in cui è possibile. 
+
+
+## Modifica del comportamento di CMAKE a tempo di compilazione
+
+Procederemo quindi a provare l'installazione di un pacchetto fondamentale di ROS: `rclcpp`, ovvero il package che permette la creazione di nodi C++ che, come detto all'inizio, sono la parte più importante di questo OS.
+
+Intanto, per ricordarlo, per installare questo pacchetto basta fare:
 
 ```sh
-rosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
+rosinstall_generator rclcpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
 ```
 ```sh
 wstool init -j8 src foxy-custom.rosinstall
@@ -466,13 +483,17 @@ rosdep install --from-paths src --ignore-src --rosdistro foxy -y
 colcon build --symlink-install
 ```
 
-Nel caso totale:
+Il quale andrà in errore come il test [FAIL] esposto sopra al 18° pacchetto.  
+
+### Compilazione ad hoc di ogni pacchetto con eventuali modifiche
+
+Proveremo quindi a compilare da solo osrf_testing_tools, uno dei pacchetti che fallisce e che causa `aborted` su tutti gli altri a cascata. Eseguendo quindi:
+
 ```sh
-rosinstall_generator rclcpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
-```
+colcon build --packages-select osrf_testing_tools
+```  
 
-
-Errore che si presenta provando a compilare da solo osrf_testing_tools, uno dei pacchetti che fallisce:
+Si incontra un errore di questo tipo:
 
 ```
 Starting >>> osrf_testing_tools_cpp
@@ -530,8 +551,7 @@ Summary: 0 packages finished [50.0s]
 
 ```
 
-
-Si procede quindi a ignorare i warning e a sopprimere da txt quelli dell'architettura. _Si farà lo stesso per gli altri pacchetti a seguire prestando attenzione a non compromettere il pacchetto_.:
+Si procede quindi a ignorare i warning poichè non interessanti e a sopprimere da txt quelli dell'architettura. Si noti infatti che questi errori non sono fatali ma bensì semplici warning trattati come errori su RISC-V. _Si farà lo stesso per gli altri pacchetti a seguire prestando attenzione a non comprometterli_.:
 
 ```sh
 nano src/osrf_testing_tools_cpp/src/memory_tools/vendor/bombela/backward-cpp/backward.hpp
@@ -543,7 +563,7 @@ rimuovere quindi `#warning ":/ sorry, ain't know no nothing none not of your arc
 colcon build --cmake-args -DCMAKE_CXX_FLAGS="-Wno-error -Wno-unused-variable -Wno-maybe-uninitialized -Wno-error=cpp -Wno-error=pedantic"
 ```
 
-Procedendo, purtroppo vi sono altri errori per molti pacchetti, tutti dovuti alla mancanza di un pacchetto 'benchmark'.
+Procedendo, purtroppo vi sono altre tipologie di errori per molti pacchetti, tutti dovuti alla mancanza di un pacchetto 'benchmark'.
 
 ```
 CMake Error at CMakeLists.txt:20 (find_package):
@@ -576,7 +596,7 @@ Summary: 60 packages finished [20min 13s]
   44 packages not processed
 ```
 
-Ricordando che non si hanno privilegi di root, si procederà quindi in questo modo:  
+Seguiamo quindi il suggerimento `Add the installation prefix of "benchmark" to CMAKE_PREFIX_PATH`, ricordando che non si hanno privilegi di root.   
 
 Clonare la repo in locale per evitare il comando `sudo`
 ```sh
@@ -591,11 +611,12 @@ mkdir build
 ```sh
 cd build
 ```
-Disabilitare i test di Google per evitare errori inattesi:
+
+Disabilitare infine i test di Google per evitare errori inattesi successivi:
 ```sh
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/local -DBENCHMARK_ENABLE_TESTING=OFF ..
 ```
-Procedere con l'installazione
+E procedere con l'installazione di `benchmark`
 ```sh
 make
 ```
@@ -609,7 +630,7 @@ CMake Error at CMakeLists.txt:88 (message):
   Architecture 'riscv64' is not supported.
 ```
 
-Per fortuna, questo pacchetto non è essenziale per la costruzione dei nodi bensì in ambito di simulazione e quindi, può essere ignorato tramite la modifica del comando di compilazione (da qui in avanti):
+Per fortuna, questo pacchetto non è essenziale per la costruzione dei nodi bensì in ambito di simulazione e quindi, può essere ignorato tramite la modifica del comando di compilazione (da qui in avanti usato per pacchetti non importanti che danno errori di questo tipo):
 
 ```sh
 colcon build --packages-skip mimick_vendor
@@ -623,16 +644,17 @@ cd src/rcutils && nano CMakeLists.txt
 
 e commentare la riga find_package(mimick_vendor REQUIRED) tramite `#`.  
 
-Purtroppo però le dipendenze di questo pacchetto si presentano in molti file che lo utilizzano per testing. Dopo una ricerca, il comando per evitare ciò diventa:
+Purtroppo però le dipendenze di questo pacchetto si presentano in molti file che lo utilizzano per testing. Dopo un'attenta ricerca, il comando per evitare ciò diventa:
 
 ```sh
 colcon build --packages-skip mimick_vendor --cmake-args -DBUILD_TESTING=OFF
 ```
 
-A questo punto la compilazione prosegue fino al pacchetto finale di installazione rclpp che però va in errore in questo modo:
+Di fatti, questo comando ci permette di evitare tutti gli altri pacchetti di test che non sono molto interessanti nel nostro caso e potrebbero portare a una grande perdita di tempo.  
+
+A questo punto la compilazione prosegue fino al pacchetto finale di installazione rclcpp che però va in errore in questo modo:
 
 ```
-
 [Processing: rclcpp]                                             
 --- stderr: rclcpp                                              
 /home/fsimoni/ros2_foxy_ws/src/rclcpp/rclcpp/src/rclcpp/executor.cpp: In member function ‘bool rclcpp::Executor::get_next_ready_executable(rclcpp::AnyExecutable&)’:
@@ -672,13 +694,23 @@ Esaminando lo stderr, notiamo che abbiamo due warning:
 Di conseguenza il pacchetto è quindi stato compilato completamente e si può procedere con la demo sui nodi.
 
 
-[Facoltativo] Possiamo aggiungere tute le variabili d'ambiente per evitare di specificare i percorsi delle librerie a tempo di compilazione:
+## Creazione di Nodi tramite ROS installato su RISC-V
+
+Siamo quindi riusciti a installare quasi per intero la libreria `rclcpp` con tutte le sue dipendenze. Dobbiamo quindi cercare di creare nodi C++ funzionanti per dimostrarne il funzionamento.
+
+### [Facoltativo] Aggiunta ricorsiva delle variabili al PATH per ogni pacchetto
+
+Dal momento che non sono disponibili i comandi di facile utilizzo come `ros2` e dobbiamo procedere manualmente, è possibile semplificare il lavoro aggiungendo tutte le variabili d'ambiente per evitare di specificare i percorsi durante la compilazione dei nodi che verranno creati con `rclcpp`:
 
 ```sh
 export CPLUS_INCLUDE_PATH=$(find /home/fsimoni/ros2_foxy_ws/install -type d -name include | paste -sd ":" -):${CPLUS_INCLUDE_PATH}
 
 export LD_LIBRARY_PATH=$(find /home/fsimoni/ros2_foxy_ws/install -type d -name lib | paste -sd ":" -):${LD_LIBRARY_PATH}
 ```
+
+### Creazione di nodi di esempio
+
+Per creare nodi in C++ è necessario creare un pacchetto che contenga il file da compilare, il quale chiama le librerie dipendenti da `rclcpp` all'occorrenza, già installate nel capitolo precedente. Faremo due prove creando due pacchetti diversi, uno semplice e uno più complesso. Per ognuno, sarà creato un nodo ed eseguito.  
 
 Spostiamoci in src e creiamo il nostro pacchetto:
 
@@ -693,7 +725,7 @@ Creiamo un file di main.cpp da cui avvieremo il nodo:
 nano main.cpp
 ```
 
-Scriviamone un semplice di prova:
+Scriviamone un semplice di prova, fatto in questo modo:
 
 ```
 #include "rclcpp/rclcpp.hpp"
@@ -726,6 +758,8 @@ g++ -o my_node src/my_package/main.cpp \
 /home/fsimoni/ros2_foxy_ws/install/rcutils/lib/librcutils.so \
 -lstdc++fs -pthread
 ```
+
+Da notare che sono state specificate a tempo di compilazione le librerie che non sono state aggiunte al PATH per evitare confusione. Di fatti, senza queste specifiche vi sarebbero una serie di errori. Dopo una lunga ricerca, abbiamo quindi capito come specificarle.
 
 Verrà quindi creato un eseguibile chiamato my_node. Runniamolo in modo classico:
 
@@ -776,7 +810,7 @@ int main(int argc, char * argv[])
 
 ```
 
-Compiliamo quindi così:
+Compiliamo quindi in modo simile ma aggiungendo le librerie che servono:
 
 ```sh
 g++ -o my_node_2 src/my_package_2/main.cpp \
@@ -795,17 +829,21 @@ E runniamo:
 ./my_node_2
 ```
 
-Ad output quindi si mostra un nodo in grado di poter operare altro nel mentre:
+Ad output quindi si mostra un nodo in grado di poter rimanere in ascolto di eventuali segnali di sensori provenienti dall'esterno. Potrebbe essere quindi in grado di eseguire un `handler` nel caso arrivi un `interrupt`. :
 ![image](https://github.com/CardiBat/ROS2-Project/assets/102695322/7c671563-f673-40ef-970f-37fd4a219abd)
 
-
-Il motivo per il quale ad ogni compilazione aggiungo i vari percorsi è perchè non abbiamo installato ROS2 su CISC e quindi non è disponibile il classico comando come:
+[NOTA]: 
+Il motivo per il quale ad ogni compilazione aggiungiamo i vari percorsi è perchè non abbiamo installato ROS2 su CISC e quindi non sono disponibili classici comandi come:
 
 ```sh
 ros2 run my_package_2 my_node_2
 ```
 
-Di fatti `ros2` non verrebbe trovato. Specifico quindi a compilazione dove cercare le librerie compilate e le altre esterne necessarie.
+Di fatti `ros2` non verrebbe trovato. Specifico quindi a compilazione dove cercare le librerie compilate e le altre esterne necessarie in modo tale di non incontrare problemi se utilizzo `./exec` per il run, nativo per g++. 
+
+## Conclusioni
+
+
 
 
 
