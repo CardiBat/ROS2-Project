@@ -661,12 +661,12 @@ Summary: 107 packages finished [14min 2s]
 ```
 
 Esaminando lo stderr, notiamo che abbiamo due warning:
-- Un warning relativo a una dichiarazione deprecata che andrebbe aggiornata, ma non è un grosso problema
-- Un warning relativo a un ciclo di while che abbassa la performance, ma anche qui non ci interessa
+- Un warning relativo a una dichiarazione deprecata che andrebbe aggiornata, ma non è un problema critico;
+- Un warning relativo a un ciclo di while che abbassa la performance, ma anche qui non è interessante per noi.
 Di conseguenza il pacchetto è quindi stato compilato completamente e si può procedere con la demo sui nodi.
 
 
-Impostiamo quindi le variabili d'ambiente di tutti:
+[Facoltativo] Possiamo aggiungere tute le variabili d'ambiente per evitare di specificare i percorsi delle librerie a tempo di compilazione:
 
 ```sh
 export CPLUS_INCLUDE_PATH=$(find /home/fsimoni/ros2_foxy_ws/install -type d -name include | paste -sd ":" -):${CPLUS_INCLUDE_PATH}
@@ -682,12 +682,12 @@ mkdir my_package
 cd my_package
 ```
 
-Creiamo un file di main.cpp:
+Creiamo un file di main.cpp da cui avvieremo il nodo:
 ```sh
 nano main.cpp
 ```
 
-Scriviamo un semplice nodo di prova:
+Scriviamone un semplice di prova:
 
 ```
 #include "rclcpp/rclcpp.hpp"
@@ -721,7 +721,7 @@ g++ -o my_node src/my_package/main.cpp \
 -lstdc++fs -pthread
 ```
 
-Verrà quindi creato un eseguibile chiamato my_node. Runniamolo con:
+Verrà quindi creato un eseguibile chiamato my_node. Runniamolo in modo classico:
 
 ```sh
 ./my_node
@@ -793,7 +793,14 @@ Ad output quindi si mostra un nodo in grado di poter operare altro nel mentre:
 ![image](https://github.com/CardiBat/ROS2-Project/assets/102695322/7c671563-f673-40ef-970f-37fd4a219abd)
 
 
-Il motivo per il quale ad ogni run aggiungo le librerie necessarie:
+Il motivo per il quale ad ogni compilazione aggiungo i vari percorsi è perchè non abbiamo installato ROS2 su CISC e quindi non è disponibile il classico comando come:
+
+```sh
+ros2 run my_package_2 my_node_2
+```
+
+Di fatti `ros2` non verrebbe trovato. Specifico quindi a compilazione dove cercare le librerie compilate e le altre esterne necessarie.
+
 
 
 
