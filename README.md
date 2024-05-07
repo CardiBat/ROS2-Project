@@ -843,8 +843,23 @@ Di fatti `ros2` non verrebbe trovato. Specifico quindi a compilazione dove cerca
 
 ## Conclusioni
 
+### Obiettivo di porting soddisfatto
 
+Durante questo progetto abbiamo approfondito e navigato attraverso la complessa esperienza di porting di ROS2 su un'architettura RISC-V, scoprendo sfide tecniche e cercando varie soluzioni possibili. Durante questo percorso, siamo riusciti a superare diversi ostacoli, adattando ROS a un ambiente non supportato, dimostrandone la possibilità di realizzazione.
 
+Dopo aver quindi spiegato il funzionamento di ROS e dopo un'analisi del modo in cui viene utilizzato su Ubuntu, ci siamo immersi su RISC-V provando la compilazione di un pacchetto per la creazione di nodi. L'esito è andato a buon fine e siamo riusciti a creare nodi di esempio completamente funzionanti. 
+
+La nostra esperienza sottolinea l'importanza di una solida comprensione delle basi di ROS 2 e delle pratiche di low-level-programming per navigare con successo nel suo ecosistema, specialmente quando si affrontano sfide legate a hardware e architetture specifiche.
+
+Speriamo quindi che questo documento non solo serva come tutorial su come installare ROS su RISC-V, ma anche a come approcciarsi ad un qualsiasi porting CISC -> RISC. Di fatti qui si possono notare tutte le strategie che possono essere applicate, come l'evitare porzioni non essenziali durante l'installazione, la modifica ad hoc del compilatore, la risoluzione step-by-step per ogni dipendenza, e così via.
+
+### Sviluppi futuri
+
+Il progetto mette quindi in mostra qualche esempio di esecuzione di nodi. In futuro, si possono ovviamente aumentare le funzionalità di questi ultimi aggiungendo ad esempio altre librerie rendendolo quindi utilizzabile in un vero e proprio sistema hardware automatico come robot o comunque collegandosi a sensori fisici su boards.
+
+Inoltre, si potrebbero applicare questi passaggi per installare altre librerie come `rclpy`, equivalente di `rclcpp` ma per nodi in python. Così facendo, si potrebbero creare nodi ben più complessi e moderni per un controllo molto più esteso su vari componenti Hardware.
+
+Infine, un'altro sviluppo potrebbe essere quello di concentrarsi sul funzionamento dei pacchetti di test, ignorati in questa guida per motivi di tempo. Il loro funzionamento permetterebbe di testare in modo specifico i nodi creati.
 
 
 
