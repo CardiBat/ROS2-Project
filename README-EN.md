@@ -1,39 +1,37 @@
 # ROS-on-RISCV
 
-## Introduzione
+## Intro
 
-ROS (Acronimo di Robot Operating System) rappresenta un insieme di librerie software e strumenti destinati alla realizzazione di applicazioni robotiche. Questo sistema include una vasta gamma di componenti, che vanno dai driver agli algoritmi all'avanguardia, fino agli strumenti di sviluppo potenti, fornendo tutto il necessario per lo sviluppo di progetti robotici sofisticati. ROS 2 è stato progettato come evoluzione di ROS 1, con l'obiettivo di rispondere alle esigenze in continua evoluzione nel campo della robotica e dell'automazione, sfruttando i punti di forza di ROS 1 e migliorando gli aspetti che presentavano limitazioni.
-
-
-## I primi passi
-
-Per cominciare a capire il funzionamento di ROS e i suoi componenti principali, è possibile utilizzare varie finestre del terminale per farle successivamente interagire tra di loro. Prima di ciò, però, è importante avere chiaro i vari componenti che costituiscono il core di questo Sistema Operativo.
+ROS (acronym for Robot Operating System) represents a collection of software libraries and tools aimed at the creation of robotic applications. This system includes a wide range of components, from drivers to cutting-edge algorithms, to powerful development tools, providing everything needed for the development of sophisticated robotic projects. ROS 2 has been designed as the evolution of ROS 1, with the goal of addressing the continuously evolving needs in the field of robotics and automation, leveraging the strengths of ROS 1 and improving aspects that had limitations.
 
 
-### Nodi
+## First Steps
 
-I nodi in ROS sono i componenti fondamentali, che permettono all'applicazione di funzionare correttamente. Ogni nodo è indipendente dagli altri e svolge un particolare compito che gli viene assegnato (tramite codice PYTHON). Per capire come questi nodi operano, è disponibile un pacchetto di demo chiamato 'demo_nodes_*' che ne contiene sia di semplici che di più complessi.  
-Per fare qualche esempio, è disponibile un nodo di nome 'talker' che si preoccupa di mandare un messaggio di 'Hello World' ogni secondo; è inoltre disponbile un nodo chiamato 'listener' che invece si mette in ascolto di eventuali messaggi. Vi sono altri esempi più complessi, come il 'turtlesim' che rappresenta una tartaruga statica in uno spazio e il relativo nodo 'turtle_teleop_key' che manda i comandi di movimento alla tartaruga dall'input da tastiera.  
-Questo insieme di nodi, ovviamente, può essere programmato ad hoc a seconda delle esigenze, prendendo magari spunto da un nodo di demo e modificato a proprio piacimento. Ne deriva inoltre che questi nodi non possono comunicare tra loro se non si adotta una certa politica di comunicazione che, come vedremo in seguito, prende il nome di 'Topic'.
+To begin understanding how ROS and its main components work, it's possible to use various terminal windows to later have them interact with each other. Before this, however, it's important to understand the various components that make up the core of this Operating System.
+
+### Nodes
+
+Nodes in ROS are fundamental components that allow the application to function correctly. Each node is independent from the others and performs a specific task assigned to it (via PYTHON code). To understand how these nodes operate, a demo package called 'demo_nodes_*' is available that contains both simple and more complex nodes.  
+For example, there is a node named 'talker' that sends a 'Hello World' message every second; there is also a node called 'listener' that listens for incoming messages. There are other more complex examples, like 'turtlesim', which represents a static turtle in a space, and the corresponding node 'turtle_teleop_key' that sends movement commands to the turtle from keyboard input.  
+This set of nodes, of course, can be custom programmed as needed, perhaps starting from a demo node and modifying it to one's liking. It also follows that these nodes cannot communicate with each other unless a certain communication policy is adopted, which, as we will see later, is called 'Topic'.
 
 ### Topics
 
-Sapendo quindi che ogni nodo è responsabile di una determinata azione, è importante chiarire il funzionamento dei topic che ne permettono la comunicazione tra essi. Quando si aprono finestre di terminale e si decide di assegnare per ognuna un nodo, la loro interazione segue tipicamente il paradigma 'pub-sub' a scambio di messaggi dove uno o più nodi fungono da publishers e altrettanti da subscribers. Quindi, i topic non sono altro che la rappresentazione di questa comunicazione.
+Knowing then that each node is responsible for a particular action, it's important to clarify how topics, which enable communication between them, work. When terminal windows are opened and a node is assigned to each one, their interaction typically follows the 'pub-sub' message exchange paradigm where one or more nodes act as publishers and an equal number as subscribers. Therefore, topics are merely the representation of this communication.
 
 <p>&nbsp;</p>
 
-![Turtlesim-topic](/turtlesim.png)  
+![Turtlesim-topic](/turtlesim.png)
 
 <p>&nbsp;</p>
 
-Come si può osservare, in questo grafico (generato tramite rqt_graph con group 0 e Nodes/Topics view) si hanno i due nodi già menzionati (la tartaruga e il suo controller) e in mezzo vi sono i vari topic di comunicazione. In particolare
-vi è il controller che comunica tramite topic 'cmd_vel' gli input da tastiera, mentre l'oggetto tartaruga comunica tramite due canali distinti il feedback e il suo stato attuale.  
-Più nello specifico, il nodo di controllo si comporta da publisher degli input da tastiera, mentre il nodo turtlesim si iscrive a quest'ultimo topic. Allo stesso modo, turtlesim opera publishing di stato feedback e status mentre il controller si iscrive a questi ultimi.
+As can be observed, in this chart (generated via rqt_graph with group 0 and Nodes/Topics view), there are the two nodes already mentioned (the turtle and its controller) and between them are the various communication topics. In particular, the controller communicates keyboard inputs through the 'cmd_vel' topic, while the turtle object communicates feedback and its current state through two distinct channels.  
+More specifically, the control node acts as a publisher of keyboard inputs, while the turtlesim node subscribes to this topic. Similarly, turtlesim operates by publishing feedback and status updates while the controller subscribes to these.
 
-### Servizi
+### Services
 
-I servizi in ROS rispondono all'esigenza dell'archiettura client-server il quale non è nativo per i topic così come sono stati creati. Infatti, un nodo tramite un topic classico manda un'informazione ogni x tempo ma non si aspetta una risposta dall'altra parte (come già accennato, segue il paradigma pub-sub).  
-Tramite i servizi, invece, è possibile implementare ciò che caratterizza l'interazione tipicamente web in cui vi sono richieste e risposte, dei server che si preoccupano di esporre servizi e i client che ne usufruiscono.
+Services in ROS meet the need of the client-server architecture, which is not native to topics as they were created. Indeed, a node through a classic topic sends information every x time but does not expect a response from the other side (as already mentioned, it follows the pub-sub paradigm).  
+Through services, however, it is possible to implement what typically characterizes web interaction, where there are requests and responses, servers that expose services, and clients that use them.
 
 <p>&nbsp;</p>
 <div align="center">
@@ -41,25 +39,25 @@ Tramite i servizi, invece, è possibile implementare ciò che caratterizza l'int
 </div>
 <p>&nbsp;</p>
 
-Nell'immagine soprastante vi è la rappresentazione dell'archiettura client-server in cui un client (ma potrebbero essere anche di più) manda richieste e riceve risposte tramite il servizio.  
-Un esempio di come questo possa essere implementato può essere osservato sempre tramite il pacchetto demo utilizzando su un terminale add_two_ints_server (nodo Server) e in un'altra finestra la keyword 'call' aggiungendo i parametri a e b. Così facendo, si manderà una richiesta al server il quale risponderà con il risultato.
+In the above image, there is a representation of the client-server architecture where one client (but there could be more) sends requests and receives responses through the service.  
+An example of how this can be implemented can be observed again through the demo package using on one terminal add_two_ints_server (Server node) and in another window the keyword 'call' adding the parameters a and b. By doing so, a request is sent to the server which will respond with the result.
 
 
-## Compilazione e Installazione
+## Compilation and Installation
 
-Normalmente, l'installazione (su Ubuntu) prevedere un semplice comando da terminale e l'installazione viene completata automaticamente. Nel nostro caso, però, si cercherà di compilare manualmente l'insieme di file per snellire il più possibile l'installazione e facilitarne il porting su un'architettura RISC-V (nonostante ROS sia progettato per architetture Intel)  
-Quindi, partiremo in ispezione su ambiente virtuale che consenta (nel caso di errori irreversibili) di non danneggiare il sistema e di conseguenza che si possano provare varie combinazioni di compilazione. Questo passo è fondamentale per capire come muoverci agilmente quando poi ci sposteremo su RISC-V.
+Normally, installation (on Ubuntu) involves a simple terminal command and the installation is automatically completed. In our case, however, we will attempt to manually compile the set of files to streamline the installation as much as possible and facilitate its porting to a RISC-V architecture (despite ROS being designed for Intel architectures)  
+We will start with an inspection on a virtual environment that allows (in case of irreversible errors) to not damage the system and consequently to try various compilation combinations. This step is essential to understand how to move agilely when we then shift to RISC-V.
 
-### Installazione di un ambiente virtuale
+### Installing a virtual environment
 
-Prima di procedere, controllare che la propria macchina sia compatibile con la virtualizzazione integrata UNIX. Lanciare quindi il comando:
+Before proceeding, check that your machine is compatible with integrated UNIX virtualization. Then run the following command:
 
 ```sh
 $ egrep -c '(vmx|svm)' /proc/cpuinfo
 ```
 
-Se il comando restituisce un numero maggiore di 0, significa che il processore supporta la virtualizzazione. Se restituisce 0, potrebbe essere necessario abilitare la virtualizzazione nel BIOS.  
-A questo punto è possibile procedere con l'installazione di KVM:  
+If the command returns a number greater than 0, it means that the processor supports virtualization. If it returns 0, you may need to enable virtualization in the BIOS.  
+At this point, you can proceed with the installation of KVM:
 
 ```sh
 sudo apt update
@@ -68,29 +66,30 @@ sudo apt update
 sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager
 ```
 
-Occorre inoltre aggiungersi ai gruppi opportuni per evitare problemi:
+It's also necessary to add oneself to the appropriate groups to avoid issues:
 
 ```sh
-sudo adduser `id -un` libvirtrosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
+sudo adduser `id -un` libvirtrosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar >
+
+ foxy-custom.rosinstall
 
 ```
 ```sh
 sudo adduser `id -un` kvm
 ```
 
-A questo punto, dopo aver riavviato la macchina per applicare le modifiche, si può procedere a lanciare KVM e a creare una VM Ubuntu 20.04 necessaria per ROS2 Foxy, con 4Gb di RAM e 4 Cores.  
-Lanciare quindi il seguente comando:
+After rebooting the machine to apply the changes, you can proceed to launch KVM and create an Ubuntu 20.04 VM necessary for ROS2 Foxy, with 4GB of RAM and 4 Cores.  
+Then run the following command:
 
 ```sh
 virt-manager
 ```
 
-e installare il sistema operativo da file ISO scaricato dal sito Ubuntu ufficiale.
+and install the operating system from an ISO file downloaded from the official Ubuntu site.
 
+### Installation of Libraries and Dependencies Required by ROS2 Foxy
 
-### Installazione delle librerie e dipendenze richieste da ROS2 Foxy
-
-Sarà opportuno installare i compilatori e le librerie Python richieste, oltre a Python se non è installato sulla propria macchina. Eseguire quindi i seguenti comandi:
+It is advisable to install the compilers and Python libraries required, as well as Python itself if it is not already installed on your machine. Execute the following commands:
 
 ```sh
 sudo apt update
@@ -99,7 +98,7 @@ sudo apt update
 sudo apt install build-essential cmake git python3-rosdep python3-rosinstall-generator python3-wstool python3-rosinstall
 ```
 
-Nel caso quindi non fosse installato, per python eseguire:
+In case Python is not installed, execute:
 
 ```sh
 sudo apt update
@@ -108,7 +107,7 @@ sudo apt update
 sudo apt install python3 python3-pip
 ```
 
-Infine, installare il compilatore colcon:
+Finally, install the colcon compiler:
 ```sh
 sudo apt update
 ```
@@ -116,19 +115,19 @@ sudo apt update
 pip3 install -U colcon-common-extensions
 ```
 
-Settare quindi permanentemente la variabile d'ambiente. Aprire la shell:
+Then permanently set the environment variable. Open the shell:
 ```sh
 nano ~/.bashrc
 ```
-Aggiungere quindi la seguente riga a fine file, salvare e riaprire il terminale:
+Add the following line at the end of the file, save it, and reopen the terminal:
 ```sh
 export PATH="$PATH:$HOME/.local/bin"
 ```
 
 
-### Download del Codice Sorgente di ROS
+### Downloading ROS Source Code
 
-Inizializzazione `rosdep` che aiuta a installare le dipendenze di sistema per i sorgenti da compilare.
+Initialize `rosdep` which helps to install system dependencies for the sources to be compiled.
 
 ```sh
 sudo rosdep init
@@ -137,8 +136,8 @@ sudo rosdep init
 rosdep update
 ```
 
-### Creazione del Workspace Catkin
-Per iniziare la configurazione dell'ambiente ROS, è necessaria la creazione di un workspace Catkin. Questo workspace fungerà da contenitore per i sorgenti e i pacchetti ROS. La creazione può essere effettuata con i seguenti comandi:
+### Creation of the Catkin Workspace
+To start configuring the ROS environment, it is necessary to create a Catkin workspace. This workspace will serve as a container for ROS sources and packages. Creation can be done with the following commands:
 
 ```sh
 mkdir -p ~/ros2_foxy_ws/src
@@ -147,41 +146,41 @@ mkdir -p ~/ros2_foxy_ws/src
 cd ~/ros2_foxy_ws
 ```
 
-### Selezione dei Pacchetti
-L'utilizzo di `rosinstall_generator` permette di selezionare specifiche parti di ROS da mettere nel file di configurazione .rosinstall. È possibile optare per l'inserimento di componenti essenziali come `ros_comm` o per una versione più completa con `desktop-full`. In ogni caso, bisogna inserire i pacchetti voluti al posto di PKGNAME. In generale quindi:
+### Selection of Packages
+Using `rosinstall_generator` allows you to select specific parts of ROS to put in the .rosinstall configuration file. You can opt to include essential components like `ros_comm` or a more complete version with `desktop-full`. In any case, you need to replace PKGNAME with the packages you want. Generally:
 
 ```sh
 rosinstall_generator [PKGNAME] --rosdistro foxy --deps --tar > foxy-desktop.rosinstall
 ```
-Un esempio potrebbe essere considerare pacchetti come rclcpp per la programmazione di nodi in C++, rclpy per la programmazione di nodi in Python, e example_interfaces che fornisce esempi di interfacce di servizio e messaggi che potrebbero essere utilizzati per esperimenti e apprendimento.
+An example might be to consider packages like rclcpp for programming nodes in C++, rclpy for programming nodes in Python, and example_interfaces which provides examples of service interfaces and messages that could be used for experiments and learning.
 
 ```sh
 rosinstall_generator rclcpp rclpy example_interfaces --rosdistro foxy --deps --tar > foxy-desktop.rosinstall
 ```
 
-Successivamente si scaricheranno i pacchetti presenti sul file di configurazione appena creato:
+Next, you will download the packages listed in the newly created configuration file:
 
 ```sh
 wstool init -j8 src foxy-desktop.rosinstall
 ```
 
-### Compilazione di ROS
-È fondamentale garantire che tutte le dipendenze dei pacchetti selezionati siano soddisfatte prima della compilazione. Questo è possibile mediante l'utilizzo di `rosdep`:
+### Compilation of ROS
+It is crucial to ensure that all dependencies of the selected packages are met before compilation. This is possible through the use of `rosdep`:
 
 ```sh
 rosdep install --from-paths src --ignore-src --rosdistro foxy -y
 ```
 
-Utilizzando `colcon`, lo strumento di build consigliato per ROS 2, si compilano i pacchetti scaricati con le relative dipendenze:
+Using `colcon`, the recommended build tool for ROS 2, compile the downloaded packages with their dependencies:
 
 ```sh
 colcon build --symlink-install
 ```
 
 
-### Processo di Disinstallazione e Ripristino
+### Uninstallation and Restoration Process
 
-Per eliminare i componenti di ROS 2, è sufficiente rimuovere il workspace di compilazione, che tipicamente include le directory `build`, `install`, e `log`. Supponendo che il workspace si trovi in `~/ros2_foxy_ws`, eseguire i seguenti comandi:
+To remove ROS 2 components, simply remove the compilation workspace, which typically includes the `build`, `install`, and `log` directories. Assuming that the workspace is located in `~/ros2_foxy_ws`, execute the following commands:
 
 ```sh
 cd ~/ros2_foxy_ws
@@ -189,18 +188,17 @@ cd ~/ros2_foxy_ws
 ```sh
 rm -rf build install log
 ```
-Questo rimuoverà tutte le directory relative alla compilazione e all'installazione dei pacchetti ROS 2.
+This will remove all directories related to the compilation and installation of ROS 2 packages.
 
-Per riconfigurare l'ambiente di sviluppo da uno stato pulito, è opportuno anche rimuovere eventuali riferimenti residui a ROS 2 presenti nel file di configurazione della shell, come `.bashrc` o `.zshrc`, a seconda della shell in uso. Questi riferimenti possono includere l'aggiunta del percorso di installazione di ROS 2 al `PATH`, nonché il sourcing di script di setup.
+To reconfigure the development environment from a clean state, it is also advisable to remove any residual ROS 2 references in the shell configuration file, such as `.bashrc` or `.zshrc`, depending on the shell in use. These references might include adding the ROS 2 installation path to the `PATH`, as well as sourcing setup scripts.
 
-Aprire il file di configurazione della shell con un editor di testo:
+Open the shell configuration file with a text editor:
 
 ```sh
-nano ~/.bashrc  # oppure utilizzare ~/.zshrc per zsh
-rosinstall_generator osrf_testing_tools_cpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
+nano ~/.bashrc  # or use ~/.zshrc for zsh
 ```
 
-Ricercare e rimuovere le linee associate all'ambiente ROS 2, che potrebbero apparire come:
+Search for and remove lines associated with the ROS 2 environment, which might appear as:
 
 ```sh
 source /opt/ros/foxy/setup.bash
@@ -209,26 +207,25 @@ source /opt/ros/foxy/setup.bash
 source ~/ros2_foxy_ws/install/local_setup.bash
 ```
 
-Dopo aver apportato le modifiche, salvare il file e riavviare il terminale per assicurarsi che le modifiche abbiano effetto. Questo passaggio garantisce che l'ambiente del terminale sia privo di qualsiasi configurazione relativa a ROS, permettendo una nuova installazione o la configurazione di un ambiente differente in modo pulito e senza conflitti.
+After making changes, save the file and restart the terminal to ensure the changes take effect. This step ensures that the terminal environment is free of any ROS-related configuration, allowing for a new installation or the setup of a different environment cleanly and without conflicts.
 
 
-## Verso il porting su RISC-V: Utilizzo del cluster Monte Cimone
+## Toward Porting on RISC-V: Using the Monte Cimone Cluster
 
-Dopo aver ben chiaro il funzionamento di ROS su una macchina Ubuntu, ora si cercherà di seguire questi passaggi adattandosi alla macchina obiettivo, in questo caso basata su RISC-V. Si incontreranno diversi problemi, dal momento che non è supportata nativamente e quindi vi saranno da fare diversi interventi a livello di compilazione. Bisognerà quindi cercare di ignorare passaggi non fondamentali e di scendere a basso livello se alcuni comandi come rosdep o colcon potessero non funzionare. 
+After understanding the workings of ROS on an Ubuntu machine, we will now attempt to adapt these steps to the target machine, in this case based on RISC-V. We will encounter several issues since it is not natively supported, requiring various compilation-level interventions. Therefore, it will be necessary to skip non-essential steps and delve into low-level operations if commands like rosdep or colcon might not function.
 
-Prima di cominciare, è opportuno imparare a orientarsi con facilità all'interno della macchina RISC-V denominata Monte-Cimone. I prossimi passaggi si occuperanno di chiarire il più possibile le operazioni principali. 
+Before starting, it's useful to learn how to navigate the RISC-V machine named Monte-Cimone easily. The next steps will clarify the main operations as much as possible.
 
-### Collegamento e Login 
+### Connection and Login
 
-Per iniziare a esercitarsi sull'utilizzo di un processore di tipo RISC, è disponibile un cluster con vari nodi denominato Monte Cimone. Questa macchina è accessibile dal proprio PC (previa registrazione da form) tramite il comando di SSH:
+To start practicing with a RISC-type processor, a cluster with various nodes named Monte Cimone is available. This machine is accessible from your PC (after registration via a form) using the SSH command:
 
 ```sh
 ssh username@beta.dei.unibo.it -p 2223
 ```
 > output: username@mcimone-login:~$ 
 
-
-Dopo aver inserito la password fornita dal docente, cambierà il proprio username dal terminale e verrà stampato il comando di `nodeinfo` (richiamabile anche successivamente per avere informazioni in tempo reale dal `login`). La schermata mostrerà quindi tutti i nodi (disponibili _se e solo se_ sono in stato di `IDLE`):  
+After entering the password provided by the instructor, your username on the terminal will change and the `nodeinfo` command (which can also be called later for real-time information from the login) will be displayed. The screen will then show all nodes (available _if and only if_ they are in the `IDLE` state):  
 
 <p>&nbsp;</p>
 <div align="center">
@@ -236,38 +233,38 @@ Dopo aver inserito la password fornita dal docente, cambierà il proprio usernam
 </div>
 <p>&nbsp;</p>
 
-NOTA IMPORTANTE: Il login è basato su architettura Intel (e quindi CISC). Sarà quindi opportuno proseguire collegandosi a un nodo per raggiungere effettivamente l'architettura RISC-V.
+IMPORTANT NOTE: The login is based on Intel architecture (and therefore CISC). It will then be appropriate to proceed by connecting to a node to actually reach the RISC-V architecture.
 
+### Brief Description of Nodes and Their Use
 
+The available nodes are of two types depending on the partition. There are `sifive-nodes`, each consisting of 4 cores, while there are `milkv-nodes` which have up to 64 cores each. The entire system is installed with `Slurm`, an open-source job scheduler capable of organizing the start of processes simply.
 
-### Breve descrizione dei nodi e il loro uso
-
-I nodi disponibili sono di due tipologie a seconda della partizione. Vi sono i `sifive-nodes` i quali sono composti da 4 Core ciascuno, mentre vi sono i `milkv-nodes` che possiedono fino a 64 core per ognuno di essi. Per tutto questo sistema è installato `Slurm`, un job scheduler open source in grado di organizzare l'avvio di processi in modo semplice.  
-
-Per entrare rapidamente in un nodo e avviare un job, è sufficiente digitare il seguente comando (con nx = n° di core):
+To quickly enter a node and start a job, simply type the following command (with nx = number of cores):
 
 ```sh
 srun -n4 --pty bash
 ```
 
-Questo comando è utile per utilizzare il primo nodo disponibile, ma se invece si vuole cercare ad esempio di usare un `milkv` allora bisogna seguire il processo completo, ossia allocazione, SSH, eventuale uso e infine deallocazione.  
-Per allocare un nodo si usa il comando `salloc` seguito dal n° di core e dal selettore di partizione con relativo nome. 
+This command is useful for using the first available node, but if you want to try using a `milkv`, then you must follow the complete process, namely allocation, SSH, potential use, and finally deallocation.
+To allocate a node, use the `salloc` command followed by the number of cores and the partition selector with its name.
 
+```sh
 salloc -n64 -p mcimone-milkvs
+```
 
-Se non si sanno i nomi delle partizioni è sufficiente digitare il comando `sinfo` per averne l'elenco. In ogni caso, dopo questa operazione è possibile scoprire quale nodo della partizione è stato allocato con `nodeinfo` e infine eseguire il comando:
+If you don't know the names of the partitions, it is sufficient to type the `sinfo` command to get the list. In any case, after this operation, you can find out which node of the partition has been allocated with `nodeinfo` and then execute the command:
 
 ```sh
 ssh fsimoni@mcimone-milkv-1
 ```
 
-Riuscendo così ad entrare con Secure Shell dentro al nodo. Da qui, è possibile riutilizzare `srun` per avviare un job. Per deallocare, invece, digitare il comando `squeue` per scoprire il PID del nodo allocato e infine il comando di cancellazione seguito da quest'ultimo.
+Thus managing to enter via Secure Shell into the node. From here, it is possible to reuse `srun` to start a job. To deallocate, instead, type the `squeue` command to find out the PID of the allocated node and then the cancellation command followed by the latter.
 
 ```sh
 scancel [PID]
 ```
 
-Per completezza, viene riportato l'utilizzo generale di questi due comandi:
+For completeness, here is the general usage of these two commands:
 
 ```sh
 salloc -n <> -t <hours:minutes:seconds> [-p <>] [-w <>] [--exclusive]
@@ -277,18 +274,16 @@ salloc -n <> -t <hours:minutes:seconds> [-p <>] [-w <>] [--exclusive]
 srun -n <n_task_to_allocate> [-N <n_nodes_to_run> ] [-p <partitions>] [-w <specific_node>] [-t <hours:minutes:seconds>] [--pty] command
 ```
 
-Noi useremo il node-4 e quindi runniamo lo stesso task su 4 core:
+We will use node-4 and therefore run the same task on 4 cores:
 ```sh
 srun -n4 -c1 -w mcimone-node-4 --pty bash
 ```
 
-Per una guida più approfondita, guardare la [guida specifica di CIMONE](https://gitlab.com/ecs-lab/courses/lab-of-big-data/riscv-hpc-perf/-/blob/main/2_slurm.md?ref_type=heads) oppure la [documentazione ufficiale](https://slurm.schedmd.com/overview.html)
+For a more detailed guide, look at the [specific CIMONE guide](https://gitlab.com/ecs-lab/courses/lab-of-big-data/riscv-hpc-perf/-/blob/main/2_slurm.md?ref_type=heads) or the [official documentation](https://slurm.schedmd.com/overview.html)
 
+### Inspection of Basic Dependencies on the RISC-V Machine
 
-
-### Ispezione delle dipendenze base sulla macchina RISC-V
-
-Riassumendo, le dipendenze necessarie per ROS2 sono:  
+Summarizing, the dependencies necessary for ROS2 are:
 
 - build-essential
 - cmake
@@ -300,51 +295,52 @@ Riassumendo, le dipendenze necessarie per ROS2 sono:
 - python3-wstool
 - python3-rosinstall  
 
-Bisogna quindi verificarne la presenza sulla macchina RISC-V, eventualmente installarle e a questo punto si potrà procedere con il porting.  
-_Nota importante_: Non si hanno privilegi di root per installare programmi sulla macchina che si usa, perciò eventuali programmi saranno da installare sulla propria directory Desktop da _Sorgente_ e dovrà quindi essere aggiornata la variabile d'ambiente PATH per ognuno di essi (oppure si può richiedere all'amministratore in alcuni casi).
+You must therefore check for their presence on the RISC-V machine, possibly install them, and at this point, you can proceed with the porting.
+_Important note_: You
 
-Runniamo il seguente comando:
+ do not have root privileges to install programs on the machine you are using, so any programs must be installed in your own Desktop directory from _Source_ and you must then update the PATH environment variable for each of them (or you can ask the administrator in some cases).
+
+Run the following command:
 
 ```sh
-dpkg -l | grep <nome_pacchetto>
+dpkg -l | grep <package_name>
 ```
 
-Sostituendo `<nome_pacchetto>` con python3, git, cmake e build-essential. Notando la mancanza di rosdep, rosinstall-generator, wstool e rosinstall, essi saranno da installare nella directory corrente e da aggiungere al PATH.
+Replacing `<package_name>` with python3, git, cmake, and build-essential. Noting the absence of rosdep, rosinstall-generator, wstool, and rosinstall, these will need to be installed in the current directory and added to the PATH.
 
-Installazione: 
+Installation:
 
 ```sh
 pip3 install --user rosdep rosinstall-generator wstool rosinstall
 ```
-Dove `--user` specifica la directory locale e non di sistema
+Where `--user` specifies the local directory and not the system
 
-Impostazione di PATH:
+Setting PATH:
 
-Dalla HOME (~) runnare `nano .bashrc` e aggiungere la seguente riga in fondo al file, che cerca in locale le directory dei pacchetti:
+From HOME (~) run `nano .bashrc` and add the following line at the bottom of the file, which looks in the local directories for packages:
 
 ```sh
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Salvare, chiudere nano e ricaricare bashrc con il seguente comando:
+Save, close nano and reload bashrc with the following command:
 
 ```sh
 source ~/.bashrc
 ```
-Dopo un controllo generale con opzioni `--version` si noterà che tutto è stato installato completamente.
+After a general check with `--version` options, you will notice that everything has been fully installed.
 
+## ROS Compilation Tests on RISC-V
 
-## Prove di compilazione di ROS su RISC-V
+We have reached the heart of the project: the porting of an operating system not compatible with RISC. It will be necessary to move cautiously, paying attention to installations, conflicts, and dependencies. Additionally, we must be able to find alternatives if some solutions do not work.
 
-Siamo arrivati al cuore del progetto: il porting di un sistema operativo non compatibile con RISC. Sarà necessario muoversi con cautela stando attenti alle installazioni, ai conflitti e alle dipendenze. Inoltre, bisognerà essere in grado di trovare alternative qualora non funzionasse qualche soluzione. 
-
-Innanzitutto, per la compilazione di ROS, si utilizza normalmente `colcon` anche se non è detto che funzioni su RISC-V. Proveremo comunque a utilizzarlo installandolo con questo comando (sempre nella directory dell'utente):
+Firstly, for the compilation of ROS, `colcon` is normally used although it is not certain that it will work on RISC-V. We will still try to use it by installing it with this command (always in the user's directory):
 
 ```sh
 pip3 install --user -U colcon-common-extensions
 ```
 
-A questo punto creare la workspace come già visto virtualmente su CISC:
+At this point, create the workspace as already seen virtually on CISC:
 
 ```sh
 mkdir -p ~/ros2_foxy_ws/src
@@ -353,33 +349,32 @@ mkdir -p ~/ros2_foxy_ws/src
 cd ~/ros2_foxy_ws
 ```
 
-### [FAIL] Prova di compilazione sui pacchetti principali ed esposizione dei problemi
+### [FAIL] Test Compilation on Main Packages and Exposure of Problems
 
+We will then try to install two test packages for simple example nodes and customization only in Python3.
 
-Proveremo quindi ad installare due pacchetti di prova per nodi semplici di esempio e personalizzazione solo in Python3.  
-
-File di configurazione:
+Configuration file:
 
 ```sh
 rosinstall_generator rclpy example_interfaces --rosdistro foxy --deps --tar > foxy-custom.rosinstall
 ```
 
-Scaricamento pacchetti:  
+Downloading packages:
 
 ```sh
 wstool init -j8 src foxy-custom.rosinstall
 ```
 
-Ora bisogna procedere con l'installazione delle dipendenze che però possono dare problemi senza privilegi di root. Nonostante rosdep metta a disposizione il flag `--as-root=FALSE`, esso non funzionerà nel nostro caso. Dovremo quindi cercare manualmente e installare tramite pip --user (come fatto in precedenza) per risolvere i problemi di root. Spostiamoci in src della workspace e runniamo i seguenti comandi:
+Now you must proceed with installing dependencies which may cause problems without root privileges. Although rosdep provides the `--as-root=FALSE` flag, it will not work in our case. We must therefore manually search and install using pip --user (as done previously) to solve the root problems. Move to the src of the workspace and run the following commands:
 
 ```sh
 cat rclpy/package.xml
 cat example_interfaces/package.xml
 ```
 
-e cerchiamo `depend` in ognuno di essi per individuare le dipendenze.
+and look for `depend` in each of them to identify the dependencies.
 
-Dipendenze di rclpy:
+Dependencies of rclpy:
 
 - ament_cmake
 - python_cmake_module
@@ -396,14 +391,14 @@ Dipendenze di rclpy:
 - rmw_implementation
 - unique_identifier_msgs
 
-Dipendenze di example_interfaces:
+Dependencies of example_interfaces:
 
 - ament_cmake
 - rosidl_default_generators
 - action_msgs
 - rosidl_default_runtime
 
-Per capire quali dipendenze esattamente manchino, serve utilizzare rosdep che però funziona solo con privilegi di root poichè cerca in tutte le cartelle, anche quelle di admin. Per evitare che vada a cercare in cartelle su cui non ha il permesso, utilizzare questa serie di comandi:
+To understand exactly which dependencies are missing, use rosdep which however only works with root privileges since it searches all folders, including admin ones. To prevent it from searching folders it does not have permission for, use this series of commands:
 
 ```sh
 mkdir -p $HOME/.ros/rosdep/sources.list.d
@@ -411,33 +406,35 @@ echo 'export ROSDEP_SOURCE_PATH="$HOME/.ros/rosdep/sources.list.d"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-e quindi avviare rosdep:
+and then start rosdep:
 ```sh
 rosdep init
 rosdep update
 ```
-a questo punto si può utilizzare per risolvere le dipendenze:
+at this point, it can be used to resolve dependencies:
 
 ```sh
 rosdep install --from-paths src --ignore-src --rosdistro foxy -y
 ```
 
-Ma ora ci sarà il problema di RISC-V, ovvero tentando la compilazione:
+But now there will be a problem with RISC-V, namely attempting compilation:
 ```
 colcon build --symlink-install
 ```
 
-L'output infatti ci dice:
+The output indeed tells us:
 
 ```
 18 packages finished [1min 37s]: 
 - 1 package failed: osrf_testing_tools_cpp
 - 3 packages aborted: ament_cmake_export_include_directories ament_lint_cmake ament_xmllint
-- 10 packages had stderr output: ament_cmake_test ament_copyright ament_cppcheck ament_flake8 ament_lint ament_lint_cmake ament_package ament_pep257 fastcdr osrf_testing_tools_cpp
+- 10 packages had stderr output: ament_cmake_test ament_copyright ament_cppcheck ament_flake8 ament_lint ament_lint_cmake ament_package ament_pep257
+
+ fastcdr osrf_testing_tools_cpp
 - 86 packages not processed
 ```
 
-La stessa situazione si presenta anche clonando manualmente ogni dipendenza tramite comando git (con token). 
+The same situation also arises when manually cloning each dependency through the git command (with token).
 
 ```sh
 git clone https://<token>@github.com/ros2/<package>.git
@@ -449,26 +446,25 @@ colcon build --packages-select rmw_implementation_cmake
 cd ..
 ```
 
-Si rimane quindi bloccati in questa situazione poichè anche scaricando solo rlcpy (che ha sempre più di 100 dipendenze) la compilazione si blocca e non funziona compilare manualmente i pacchetti uno per uno perchè non si risolvono le dipendenze ugualmente. Qualsiasi nodo anche di prova dipende da rlcpp o rlcpy quindi non è comunque possibile alleggerire il carico di pacchetti che si aggira sempre sui 100.
+We thus remain stuck in this situation because even downloading only rlcpy (which always has more than 100 dependencies) the compilation stops and manually compiling the packages one by one does not resolve the dependencies either. Any test node depends on rlcpp or rlcpy so it is not possible to lighten the load of packages which always hovers around 100.
 
-### Possibili soluzioni e scelta della più efficace
+### Possible Solutions and Choosing the Most Effective
 
-Vi sono 3 possibili soluzioni a questi problemi:
+There are three possible solutions to these problems:
 
-- Uso di pacchetti precompilati
-- Evitare rlcpy/rlcpp usando ad esempio pacchetti semplici di scambi di messaggi come HTTP o SOCKET quindi IPC (Internal Process Communication)
-- Cambiare l'approccio del compilatore in modo manuale per ogni pacchetto che va in errore.
+1. **Use of Precompiled Packages**: This option is generally less engaging because it doesn't allow us to learn about and solve the compilation issues firsthand.
+   
+2. **Avoid rlcpy/rlcpp by using simple message exchange packages like HTTP or SOCKET, thus IPC (Internal Process Communication)**: This could sidestep the problem but doesn't address our main goal of working directly with ROS core functionalities.
+   
+3. **Manually changing the compiler's approach for each package that fails**: This option allows us to deeply understand and possibly correct specific issues related to the architecture or compiler settings. This is the most informative approach and aligns with our objective of understanding how to compile any package, avoiding intrinsic architectural errors that might just be simple checks and not actual malfunctions.
 
-Le prime due sono poco interessanti per il nostro progetto. Noi vogliamo capire come compilare qualsiasi pacchetto (sempre se possibile) evitando errori intrinsechi di architettura che potrebbero trattarsi solo di semplici controlli e non di effettivo non funzionamento. *_Eviteremo quindi eventuali pacchetti di simulazione, controllo o test nel caso essi non ci permettano di proseguire_*.
+We will proceed with the third option, going low-level by modifying the CMAKE files to force compilation wherever possible.
 
-Proseguiremo quindi scendendo a basso livello cambiando i file di CMAKE forzando la compilazione in tutti i casi in cui è possibile. 
+## Modifying CMAKE Behavior at Compile Time
 
+We will attempt to install a fundamental ROS package: `rclcpp`, which enables the creation of C++ nodes and is a critical part of this OS.
 
-## Modifica del comportamento di CMAKE a tempo di compilazione
-
-Procederemo quindi a provare l'installazione di un pacchetto fondamentale di ROS: `rclcpp`, ovvero il package che permette la creazione di nodi C++ che, come detto all'inizio, sono la parte più importante di questo OS.
-
-Intanto, per ricordarlo, per installare questo pacchetto basta fare:
+To install this package, execute:
 
 ```sh
 rosinstall_generator rclcpp --rosdistro foxy --deps --tar > foxy-custom.rosinstall
@@ -483,17 +479,17 @@ rosdep install --from-paths src --ignore-src --rosdistro foxy -y
 colcon build --symlink-install
 ```
 
-Il quale andrà in errore come il test [FAIL] esposto sopra al 18° pacchetto.  
+This will result in an error as demonstrated in the previous [FAIL] test, at the 18th package.
 
-### Compilazione ad hoc di ogni pacchetto con eventuali modifiche
+### Ad Hoc Compilation of Each Package with Possible Modifications
 
-Proveremo quindi a compilare da solo osrf_testing_tools, uno dei pacchetti che fallisce e che causa `aborted` su tutti gli altri a cascata. Eseguendo quindi:
+We will try to compile `osrf_testing_tools_cpp`, one of the packages that fails and causes others to abort in cascade. Running:
 
 ```sh
-colcon build --packages-select osrf_testing_tools
+colcon build --packages-select osrf_testing_tools_cpp
 ```  
 
-Si incontra un errore di questo tipo:
+Encounters an error like this:
 
 ```
 Starting >>> osrf_testing_tools_cpp
@@ -516,7 +512,9 @@ In file included from /home/fsimoni/ros2_foxy_ws/src/osrf_testing_tools_cpp/src/
  3920 |     ucontext_t *uctx = static_cast<ucontext_t *>(_ctx);
       |                 ^~~~
 cc1plus: all warnings being treated as errors
-gmake[2]: *** [src/memory_tools/CMakeFiles/memory_tools.dir/build.make:76: src/memory_tools/CMakeFiles/memory_tools.dir/custom_memory_functions.cpp.o] Error 1
+gmake[2]: *** [src/memory_tools/CMakeFiles/memory_tools.dir/build.make:76: src/memory_tools/C
+
+MakeFiles/memory_tools.dir/custom_memory_functions.cpp.o] Error 1
 gmake[2]: *** Waiting for unfinished jobs....
 /home/fsimoni/ros2_foxy_ws/src/osrf_testing_tools_cpp/src/memory_tools/././vendor/bombela/backward-cpp/backward.hpp: In static member function ‘static void backward::SignalHandling::handleSignal(int, siginfo_t*, void*)’:
 /home/fsimoni/ros2_foxy_ws/src/osrf_testing_tools_cpp/src/memory_tools/././vendor/bombela/backward-cpp/backward.hpp:3920:17: error: unused variable ‘uctx’ [-Werror=unused-variable]
@@ -547,23 +545,23 @@ Failed   <<< osrf_testing_tools_cpp [47.4s, exited with code 2]
 Summary: 0 packages finished [50.0s]
   1 package failed: osrf_testing_tools_cpp
   1 package had stderr output: osrf_testing_tools_cpp
-
-
 ```
 
-Si procede quindi a ignorare i warning poichè non interessanti e a sopprimere da txt quelli dell'architettura. Si noti infatti che questi errori non sono fatali ma bensì semplici warning trattati come errori su RISC-V. _Si farà lo stesso per gli altri pacchetti a seguire prestando attenzione a non comprometterli_.:
+We then proceed to ignore warnings since they are not of interest and suppress architecture-related warnings from the text. Note that these errors are not fatal but merely warnings treated as errors on RISC-V. _We will do the same for the following packages, being careful not to compromise them_:
 
 ```sh
 nano src/osrf_testing_tools_cpp/src/memory_tools/vendor/bombela/backward-cpp/backward.hpp
 ```
 
-rimuovere quindi `#warning ":/ sorry, ain't know no nothing none not of your architecture!"` e runnare:
+Remove `#warning ":/ sorry, ain't know no nothing none not of your architecture!"` and run:
+
+
 
 ```sh
 colcon build --cmake-args -DCMAKE_CXX_FLAGS="-Wno-error -Wno-unused-variable -Wno-maybe-uninitialized -Wno-error=cpp -Wno-error=pedantic"
 ```
 
-Procedendo, purtroppo vi sono altre tipologie di errori per molti pacchetti, tutti dovuti alla mancanza di un pacchetto 'benchmark'.
+Moving forward, unfortunately, there are other types of errors for many packages, all due to the lack of a 'benchmark' package.
 
 ```
 CMake Error at CMakeLists.txt:20 (find_package):
@@ -596,9 +594,9 @@ Summary: 60 packages finished [20min 13s]
   44 packages not processed
 ```
 
-Seguiamo quindi il suggerimento `Add the installation prefix of "benchmark" to CMAKE_PREFIX_PATH`, ricordando che non si hanno privilegi di root.   
+So we follow the suggestion to "Add the installation prefix of 'benchmark' to CMAKE_PREFIX_PATH", remembering that we do not have root privileges.
 
-Clonare la repo in locale per evitare il comando `sudo`
+Clone the repository locally to avoid using the `sudo` command:
 ```sh
 git clone https://github.com/google/benchmark.git
 ```
@@ -612,11 +610,11 @@ mkdir build
 cd build
 ```
 
-Disabilitare infine i test di Google per evitare errori inattesi successivi:
+Finally, disable Google's tests to avoid unexpected subsequent errors:
 ```sh
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/local -DBENCHMARK_ENABLE_TESTING=OFF ..
 ```
-E procedere con l'installazione di `benchmark`
+And proceed with the installation of `benchmark`:
 ```sh
 make
 ```
@@ -624,35 +622,35 @@ make
 make install
 ```
 
-A questo punto, però, si presenta un errore importante durante la compilazione (dato dal pacchetto `mimick`):
+However, at this point, a significant error occurs during the compilation (caused by the `mimick` package):
 ```
 CMake Error at CMakeLists.txt:88 (message):
   Architecture 'riscv64' is not supported.
 ```
 
-Per fortuna, questo pacchetto non è essenziale per la costruzione dei nodi bensì in ambito di simulazione e quindi, può essere ignorato tramite la modifica del comando di compilazione (da qui in avanti usato per pacchetti non importanti che danno errori di questo tipo):
+Fortunately, this package is not essential for the construction of nodes but rather in the realm of simulation, and thus, it can be ignored by modifying the compilation command (used henceforth for non-essential packages that give this type of error):
 
 ```sh
 colcon build --packages-skip mimick_vendor
 ```
 
-Ovviamente vi sono altri pacchetti che dipendono da `mimick_vendor` e per ognuno bisogna entrare nel suo file di configurazione CMakeLists.txt e ignorarne la dipendenza. Vediamo un esempio per rcutils:
+Naturally, there are other packages that depend on `mimick_vendor`, and for each, one must enter its configuration file CMakeLists.txt and ignore the dependency. Here is an example for rcutils:
 
 ```sh
 cd src/rcutils && nano CMakeLists.txt
 ```
 
-e commentare la riga find_package(mimick_vendor REQUIRED) tramite `#`.  
+And comment out the line `find_package(mimick_vendor REQUIRED)` using `#`.  
 
-Purtroppo però le dipendenze di questo pacchetto si presentano in molti file che lo utilizzano per testing. Dopo un'attenta ricerca, il comando per evitare ciò diventa:
+Unfortunately, however, the dependencies of this package appear in many files that use it for testing. After careful research, the command to avoid this becomes:
 
 ```sh
 colcon build --packages-skip mimick_vendor --cmake-args -DBUILD_TESTING=OFF
 ```
 
-Di fatti, questo comando ci permette di evitare tutti gli altri pacchetti di test che non sono molto interessanti nel nostro caso e potrebbero portare a una grande perdita di tempo.  
+Indeed, this command allows us to avoid all the other test packages that are not very interesting in our case and could lead to a significant waste of time.
 
-A questo punto la compilazione prosegue fino al pacchetto finale di installazione rclcpp che però va in errore in questo modo:
+At this point, the compilation proceeds to the final installation package rclcpp but then fails in this way:
 
 ```
 [Processing: rclcpp]                                             
@@ -688,19 +686,18 @@ Summary: 107 packages finished [14min 2s]
 
 ```
 
-Esaminando lo stderr, notiamo che abbiamo due warning:
-- Un warning relativo a una dichiarazione deprecata che andrebbe aggiornata, ma non è un problema critico;
-- Un warning relativo a un ciclo di while che abbassa la performance, ma anche qui non è interessante per noi.
-Di conseguenza il pacchetto è quindi stato compilato completamente e si può procedere con la demo sui nodi.
+Examining the stderr, we notice that we have two warnings:
+- A warning related to a deprecated declaration that should be updated, but it is not a critical problem;
+- A warning about a while loop that decreases performance, but this is also not of interest to us.
+As a result, the package has been completely compiled and we can proceed with the demo on the nodes.
 
+## Creating Nodes through ROS Installed on RISC-V
 
-## Creazione di Nodi tramite ROS installato su RISC-V
+We have thus managed to install the `rclcpp` library almost entirely along with all its dependencies. We must now try to create working C++ nodes to demonstrate its functionality.
 
-Siamo quindi riusciti a installare quasi per intero la libreria `rclcpp` con tutte le sue dipendenze. Dobbiamo quindi cercare di creare nodi C++ funzionanti per dimostrarne il funzionamento.
+### [Optional] Recursive Addition of Variables to the PATH for Each Package
 
-### [Facoltativo] Aggiunta ricorsiva delle variabili al PATH per ogni pacchetto
-
-Dal momento che non sono disponibili i comandi di facile utilizzo come `ros2` e dobbiamo procedere manualmente, è possibile semplificare il lavoro aggiungendo tutte le variabili d'ambiente per evitare di specificare i percorsi durante la compilazione dei nodi che verranno creati con `rclcpp`:
+Since easy-to-use commands like `ros2` are not available and we must proceed manually, it is possible to simplify the work by adding all the environmental variables to avoid specifying paths during the compilation of nodes that will be created with `rclcpp`:
 
 ```sh
 export CPLUS_INCLUDE_PATH=$(find /home/fsimoni/ros2_foxy_ws/install -type d -name include | paste -sd ":" -):${CPLUS_INCLUDE_PATH}
@@ -708,11 +705,11 @@ export CPLUS_INCLUDE_PATH=$(find /home/fsimoni/ros2_foxy_ws/install -type d -nam
 export LD_LIBRARY_PATH=$(find /home/fsimoni/ros2_foxy_ws/install -type d -name lib | paste -sd ":" -):${LD_LIBRARY_PATH}
 ```
 
-### Creazione di nodi di esempio
+### Creation of Example Nodes
 
-Per creare nodi in C++ è necessario creare un pacchetto che contenga il file da compilare, il quale chiama le librerie dipendenti da `rclcpp` all'occorrenza, già installate nel capitolo precedente. Faremo due prove creando due pacchetti diversi, uno semplice e uno più complesso. Per ognuno, sarà creato un nodo ed eseguito.  
+To create nodes in C++, it is necessary to create a package that contains the file to be compiled, which calls the libraries dependent on `rclcpp` as needed, already installed in the previous chapter. We will do two tests by creating two different packages, one simple and one more complex. For each, a node will be created and executed.
 
-Spostiamoci in src e creiamo il nostro pacchetto:
+Let's move to src and create our package:
 
 ```sh
 cd /path/to/ros2_foxy_ws/src
@@ -720,12 +717,13 @@ mkdir my_package
 cd my_package
 ```
 
-Creiamo un file di main.cpp da cui avvieremo il nodo:
+Create a main.cpp file from which we will launch the node:
 ```sh
 nano main.cpp
 ```
 
-Scriviamone un semplice di prova, fatto in questo modo:
+Write a simple test one, made in this way:
+
 
 ```
 #include "rclcpp/rclcpp.hpp"
@@ -748,7 +746,7 @@ int main(int argc, char * argv[])
 }
 ```
 
-Salviamolo e compiliamolo singolarmente, dal root del progetto:
+Save it and compile it individually, from the root of the project:
 
 ```sh
 g++ -o my_node src/my_package/main.cpp \
@@ -759,25 +757,24 @@ g++ -o my_node src/my_package/main.cpp \
 -lstdc++fs -pthread
 ```
 
-Da notare che sono state specificate a tempo di compilazione le librerie che non sono state aggiunte al PATH per evitare confusione. Di fatti, senza queste specifiche vi sarebbero una serie di errori. Dopo una lunga ricerca, abbiamo quindi capito come specificarle.
+Note that the libraries not added to the PATH were specified at compile time to avoid confusion. Indeed, without these specifications, there would be a series of errors. After extensive research, we have thus understood how to specify them.
 
-Verrà quindi creato un eseguibile chiamato my_node. Runniamolo in modo classico:
+An executable named my_node will then be created. Run it in the traditional way:
 
 ```sh
 ./my_node
 ```
-Il nodo funziona e stampa a terminale:
+The node works and prints to the terminal:
 
 ![image](https://github.com/CardiBat/ROS2-Project/assets/102695322/10902e5a-8931-4e3d-a73d-ae099687105f)
 
-Per sicurezza, effettuiamo un backup:
+For safety, let's perform a backup:
 
 ```sh
-scp -r fsimoni@mcimone-node-4:/home/fsimoni/ros2_foxy_ws /home/cardigun/Scrivania/backup-riscv
+scp -r fsimoni@mcimone-node-4:/home/fsimoni/ros2_foxy_ws /home/cardigun/Desktop/backup-riscv
 ```
 
-Creiamo un altro nodo di esempio. Creiamo quindi un `my_package_2` in `src` e dentro creo un altro nodo così composto:
-
+Let's create another example node. So we create a `my_package_2` in `src` and inside I create another node composed as follows:
 ```
 #include "rclcpp/rclcpp.hpp"
 
@@ -810,7 +807,7 @@ int main(int argc, char * argv[])
 
 ```
 
-Compiliamo quindi in modo simile ma aggiungendo le librerie che servono:
+We then compile in a similar way but adding the necessary libraries:
 
 ```sh
 g++ -o my_node_2 src/my_package_2/main.cpp \
@@ -823,44 +820,41 @@ g++ -o my_node_2 src/my_package_2/main.cpp \
 -lstdc++fs -pthread
 ```
 
-E runniamo:
+and run:
 
 ```sh
 ./my_node_2
 ```
 
-Ad output quindi si mostra un nodo in grado di poter rimanere in ascolto di eventuali segnali di sensori provenienti dall'esterno. Potrebbe essere quindi in grado di eseguire un `handler` nel caso arrivi un `interrupt`. :
+The output then displays a node capable of listening for potential sensor signals coming from outside. It could therefore be able to execute a `handler` if an `interrupt` occurs:
 ![image](https://github.com/CardiBat/ROS2-Project/assets/102695322/7c671563-f673-40ef-970f-37fd4a219abd)
 
-[NOTA]: 
-Il motivo per il quale ad ogni compilazione aggiungiamo i vari percorsi è perchè non abbiamo installato ROS2 su CISC e quindi non sono disponibili classici comandi come:
+[NOTE]:
+The reason we add various paths at each compilation is because we have not installed ROS2 on CISC, and thus classic commands such as:
 
 ```sh
 ros2 run my_package_2 my_node_2
 ```
 
-Di fatti `ros2` non verrebbe trovato. Specifico quindi a compilazione dove cercare le librerie compilate e le altre esterne necessarie in modo tale di non incontrare problemi se utilizzo `./exec` per il run, nativo per g++. 
-
-## Conclusioni
-
-### Obiettivo di porting soddisfatto
-
-Durante questo progetto abbiamo approfondito e navigato attraverso la complessa esperienza di porting di ROS2 su un'architettura RISC-V, scoprendo sfide tecniche e cercando varie soluzioni possibili. Durante questo percorso, siamo riusciti a superare diversi ostacoli, adattando ROS a un ambiente non supportato, dimostrandone la possibilità di realizzazione.
-
-Dopo aver quindi spiegato il funzionamento di ROS e dopo un'analisi del modo in cui viene utilizzato su Ubuntu, ci siamo immersi su RISC-V provando la compilazione di un pacchetto per la creazione di nodi. L'esito è andato a buon fine e siamo riusciti a creare nodi di esempio completamente funzionanti. 
-
-La nostra esperienza sottolinea l'importanza di una solida comprensione delle basi di ROS 2 e delle pratiche di low-level-programming per navigare con successo nel suo ecosistema, specialmente quando si affrontano sfide legate a hardware e architetture specifiche.
-
-Speriamo quindi che questo documento non solo serva come tutorial su come installare ROS su RISC-V, ma anche a come approcciarsi ad un qualsiasi porting CISC -> RISC. Di fatti qui si possono notare tutte le strategie che possono essere applicate, come l'evitare porzioni non essenziali durante l'installazione, la modifica ad hoc del compilatore, la risoluzione step-by-step per ogni dipendenza, e così via.
-
-### Sviluppi futuri
-
-Il progetto mette quindi in mostra qualche esempio di esecuzione di nodi. In futuro, si possono ovviamente aumentare le funzionalità di questi ultimi aggiungendo ad esempio altre librerie rendendolo quindi utilizzabile in un vero e proprio sistema hardware automatico come robot o comunque collegandosi a sensori fisici su boards.
-
-Inoltre, si potrebbero applicare questi passaggi per installare altre librerie come `rclpy`, equivalente di `rclcpp` ma per nodi in python. Così facendo, si potrebbero creare nodi ben più complessi e moderni per un controllo molto più esteso su vari componenti Hardware.
-
-Infine, un'altro sviluppo potrebbe essere quello di concentrarsi sul funzionamento dei pacchetti di test, ignorati in questa guida per motivi di tempo. Il loro funzionamento permetterebbe di testare in modo specifico i nodi creati.
+are not available. In fact, `ros2` would not be found. Therefore, I specify at compilation where to find the compiled libraries and other necessary external ones so that I encounter no issues if I use `./exec` for running, which is native for g++. 
 
 
+## Conclusions
 
+### Porting Objective Achieved
 
+During this project, we delved into and navigated through the complex experience of porting ROS2 onto a RISC-V architecture, uncovering technical challenges and exploring various possible solutions. Throughout this journey, we managed to overcome several obstacles by adapting ROS to an unsupported environment, demonstrating its feasibility.
+
+After explaining how ROS operates and analyzing how it is used on Ubuntu, we dived into RISC-V and attempted to compile a package for node creation. The outcome was successful, and we were able to create fully functional example nodes.
+
+Our experience highlights the importance of a solid understanding of the fundamentals of ROS 2 and low-level programming practices for successfully navigating its ecosystem, especially when facing challenges related to specific hardware and architectures.
+
+We hope that this document will serve not only as a tutorial on how to install ROS on RISC-V but also on how to approach any CISC -> RISC porting. Indeed, here one can observe all the strategies that can be applied, such as avoiding non-essential portions during installation, making ad hoc compiler modifications, resolving dependencies step-by-step, and so on.
+
+### Future Developments
+
+The project thus showcases some examples of node execution. In the future, the functionalities of these nodes could obviously be enhanced by, for example, adding other libraries making it usable in a real automated hardware system such as robots or by connecting to physical sensors on boards.
+
+Furthermore, these steps could be applied to install other libraries like `rclpy`, the Python equivalent of `rclcpp`. By doing so, one could create much more complex and modern nodes for a much more extensive control over various hardware components.
+
+Finally, another development could be to focus on the operation of the test packages, which were ignored in this guide for time reasons. Their operation would allow for specific testing of the created nodes.
