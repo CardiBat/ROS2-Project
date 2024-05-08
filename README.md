@@ -768,7 +768,11 @@ Verrà quindi creato un eseguibile chiamato my_node. Runniamolo in modo classico
 ```
 Il nodo funziona e stampa a terminale:
 
-![image](https://github.com/CardiBat/ROS2-Project/assets/102695322/10902e5a-8931-4e3d-a73d-ae099687105f)
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/node1.png" alt="node1.png">
+</div>
+<p>&nbsp;</p>
 
 Per sicurezza, effettuiamo un backup:
 
@@ -830,7 +834,12 @@ E runniamo:
 ```
 
 Ad output quindi si mostra un nodo in grado di poter rimanere in ascolto di eventuali segnali di sensori provenienti dall'esterno. Potrebbe essere quindi in grado di eseguire un `handler` nel caso arrivi un `interrupt`. :
-![image](https://github.com/CardiBat/ROS2-Project/assets/102695322/7c671563-f673-40ef-970f-37fd4a219abd)
+
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/node2.png" alt="node2.png">
+</div>
+<p>&nbsp;</p>
 
 [NOTA]: 
 Il motivo per il quale ad ogni compilazione aggiungiamo i vari percorsi è perchè non abbiamo installato ROS2 su CISC e quindi non sono disponibili classici comandi come:
