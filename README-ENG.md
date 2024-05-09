@@ -365,40 +365,8 @@ Downloading packages:
 wstool init -j8 src foxy-custom.rosinstall
 ```
 
-Now you must proceed with installing dependencies which may cause problems without root privileges. Although rosdep provides the `--as-root=FALSE` flag, it will not work in our case. We must therefore manually search and install using pip --user (as done previously) to solve the root problems. Move to the src of the workspace and run the following commands:
-
-```sh
-cat rclpy/package.xml
-cat example_interfaces/package.xml
-```
-
-and look for `depend` in each of them to identify the dependencies.
-
-Dependencies of rclpy:
-
-- ament_cmake
-- python_cmake_module
-- rcutils
-- rmw_implementation_cmake
-- ament_index_python
-- builtin_interfaces
-- rcl
-- rcl_action
-- rcl_interfaces
-- rcl_yaml_param_parser
-- rosgraph_msgs
-- rpyutils
-- rmw_implementation
-- unique_identifier_msgs
-
-Dependencies of example_interfaces:
-
-- ament_cmake
-- rosidl_default_generators
-- action_msgs
-- rosidl_default_runtime
-
-To understand exactly which dependencies are missing, use rosdep which however only works with root privileges since it searches all folders, including admin ones. To prevent it from searching folders it does not have permission for, use this series of commands:
+Now you must proceed with installing dependencies which may cause problems without root privileges. Although rosdep provides the `--as-root=FALSE` flag, it will not work in our case.
+To understand exactly which dependencies are missing, use rosdep without root privileges and in order to prevent it from searching folders it does not have permission for, use this series of commands:
 
 ```sh
 mkdir -p $HOME/.ros/rosdep/sources.list.d
