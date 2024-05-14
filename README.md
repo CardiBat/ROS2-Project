@@ -817,6 +817,18 @@ ros2 run my_package_2 my_node_2
 
 Di fatti `ros2` non verrebbe trovato. Specifico quindi a compilazione dove cercare le librerie compilate e le altre esterne necessarie in modo tale di non incontrare problemi se utilizzo `./exec` per il run, nativo per g++. 
 
+## Nota
+
+Ad ogni nuova sessione è necessario il sourcing-export, quindi eseguire questi 3 comandi:
+
+```sh
+source ~/.bashrc
+export CPLUS_INCLUDE_PATH=$(find /home/fsimoni/ros2_foxy_ws/install -type d -name include | paste -sd ":" -):${CPLUS_INCLUDE_PATH}
+export LD_LIBRARY_PATH=$(find /home/fsimoni/ros2_foxy_ws/install -type d -name lib | paste -sd ":" -):${LD_LIBRARY_PATH}
+```
+
+
+
 ## Conclusioni
 
 ### Obiettivo di porting soddisfatto
