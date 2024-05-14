@@ -817,6 +817,219 @@ ros2 run my_package_2 my_node_2
 
 Di fatti `ros2` non verrebbe trovato. Specifico quindi a compilazione dove cercare le librerie compilate e le altre esterne necessarie in modo tale di non incontrare problemi se utilizzo `./exec` per il run, nativo per g++. 
 
+
+### Creazione di nodi comunicanti
+
+Creiamo un client così composto:
+
+```
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/int32.hpp>
+
+class ClientNode : public rclcpp::Node
+{
+public:
+    ClientNode() : Node("client_node")
+    {
+        publisher_ = this->create_publisher<std_msgs::msg::Int32>("server_topic", 10);
+        timer_ = this->create_wall_timer(
+            std::chrono::seconds(5), std::bind(&ClientNode::send_message, this));
+    }
+
+private:
+    void send_message()
+    {
+        auto message = std_msgs::msg::Int32();
+        message.data = 1; // puoi cambiare tra 1 e 2 per testare le diverse funzioni
+        RCLCPP_INFO(this->get_logger(), "Sending message: %d", message.data);
+        publisher_->publish(message);
+    }
+
+    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr publisher_;
+    rclcpp::TimerBase::SharedPtr timer_;
+};
+
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+    auto node = std::make_shared<ClientNode>();
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+```
+
+Eseguibile con:
+
+```
+RUN CLIENT:
+
+g++ -o client src/my_package_3/client.cpp \          
+-I/home/fsimoni/ros2_foxy_ws/install/rclcpp/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rcutils/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rcl/include \
+-I/home/fsimoni/ros2_foxy_ws/install/tracetools/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rmw/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rcpputils/include \
+-I/home/fsimoni/ros2_foxy_ws/install/std_msgs/include \
+-I/home/fsimoni/ros2_foxy_ws/install/builtin_interfaces/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_cpp/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/include \
+-L/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rcutils/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rcl/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/tracetools/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rmw/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rcpputils/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/statistics_msgs/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/std_msgs/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rosgraph_msgs/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_cpp/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/libstatistics_collector/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcutils/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/tracetools/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rmw/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcpputils/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/statistics_msgs/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/std_msgs/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosgraph_msgs/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_cpp/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/libstatistics_collector/lib \
+-lrclcpp -lrcutils -lrcl -ltracetools -lrmw -lrosidl_runtime_c \
+-lrcl_yaml_param_parser -lrcpputils -lstatistics_msgs__rosidl_typesupport_cpp \
+-lstd_msgs__rosidl_typesupport_cpp -lrosgraph_msgs__rosidl_typesupport_cpp \
+-lrosidl_typesupport_cpp -lstdc++fs -pthread -llibstatistics_collector
+```
+
+Creiamo anche il Server:
+
+```
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/int32.hpp>
+
+class ServerNode : public rclcpp::Node
+{
+public:
+    ServerNode() : Node("server_node")
+    {
+        subscription_ = this->create_subscription<std_msgs::msg::Int32>(
+            "server_topic", 10, std::bind(&ServerNode::handle_message, this, std::placeholders::_1));
+    }
+
+private:
+    void handle_message(const std_msgs::msg::Int32::SharedPtr msg)
+    {
+        int result = 0;
+        if (msg->data == 1)
+        {
+            result = function1();
+        }
+        else if (msg->data == 2)
+        {
+            result = function2();
+        }
+        else
+        {
+            RCLCPP_WARN(this->get_logger(), "Received unsupported value: %d", msg->data);
+            return;
+        }
+
+        RCLCPP_INFO(this->get_logger(), "Function result: %d", result);
+    }
+
+    int function1()
+    {
+        RCLCPP_INFO(this->get_logger(), "Executing function1");
+        return 10; // valore di ritorno di esempio
+    }
+
+    int function2()
+    {
+        RCLCPP_INFO(this->get_logger(), "Executing function2");
+        return 20; // valore di ritorno di esempio
+    }
+
+    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr subscription_;
+};
+
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+    auto node = std::make_shared<ServerNode>();
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+```
+
+Eseguibile con:
+
+```
+g++ -o server src/my_package_3/server.cpp \          
+-I/home/fsimoni/ros2_foxy_ws/install/rclcpp/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rcutils/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rcl/include \
+-I/home/fsimoni/ros2_foxy_ws/install/tracetools/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rmw/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rcpputils/include \
+-I/home/fsimoni/ros2_foxy_ws/install/std_msgs/include \
+-I/home/fsimoni/ros2_foxy_ws/install/builtin_interfaces/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_cpp/include \
+-I/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/include \
+-L/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rcutils/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rcl/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/tracetools/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rmw/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rcpputils/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/statistics_msgs/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/std_msgs/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rosgraph_msgs/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_cpp/lib \
+-L/home/fsimoni/ros2_foxy_ws/install/libstatistics_collector/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcutils/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/tracetools/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rmw/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcpputils/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/statistics_msgs/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/std_msgs/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosgraph_msgs/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_cpp/lib \
+-Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/libstatistics_collector/lib \
+-lrclcpp -lrcutils -lrcl -ltracetools -lrmw -lrosidl_runtime_c \
+-lrcl_yaml_param_parser -lrcpputils -lstatistics_msgs__rosidl_typesupport_cpp \
+-lstd_msgs__rosidl_typesupport_cpp -lrosgraph_msgs__rosidl_typesupport_cpp \
+-lrosidl_typesupport_cpp -lstdc++fs -pthread -llibstatistics_collector
+```
+
+
+
 ## Nota
 
 Ad ogni nuova sessione è necessario il sourcing-export, quindi eseguire questi 3 comandi:
