@@ -809,15 +809,6 @@ Ad output quindi si mostra un nodo in grado di poter rimanere in ascolto di even
 </div>
 <p>&nbsp;</p>
 
-[NOTA]: 
-Il motivo per il quale ad ogni compilazione aggiungiamo i vari percorsi è perchè non abbiamo installato ROS2 su CISC e quindi non sono disponibili classici comandi come:
-
-```sh
-ros2 run my_package_2 my_node_2
-```
-
-Di fatti `ros2` non verrebbe trovato. Specifico quindi a compilazione dove cercare le librerie compilate e le altre esterne necessarie in modo tale di non incontrare problemi se utilizzo `./exec` per il run, nativo per g++. 
-
 
 ### Creazione di nodi complessi e comunicanti tramite Topic (pub-sub)
 
@@ -961,6 +952,16 @@ Qui sotto vi è l'immagine che dimostra l'interazione tra essi:
 <p>&nbsp;</p>
 
 Si dimostra quindi come la comunicazione tra i nodi in RISC-V avviene senza problemi e, ovviamente, è estendibile in senso HW collegando ad esempio il nodo Server a sensori di temperatura/pressione. A sua volta, il nodo client può essere collegato a uno switch fisico per il cambio di modalità (o pre-programmato). Si noti infine che questo paradigma non è propriamente client-server ma è pub-sub, il che significa che le risposte del server necessitano di essere lette su altri nodi nel caso ci si voglia comportare di conseguenza nell'applicazione (ad esempio, innalzando la temperatura con dispositivi appropriati collegati ai nuovi nodi).
+
+
+### [NOTA]: 
+Il motivo per il quale ad ogni compilazione aggiungiamo i vari percorsi è perchè non abbiamo installato ROS2 su CISC e quindi non sono disponibili classici comandi come:
+
+```sh
+ros2 run my_package_2 my_node_2
+```
+
+Di fatti `ros2` non verrebbe trovato. Specifico quindi a compilazione dove cercare le librerie compilate e le altre esterne necessarie in modo tale di non incontrare problemi se utilizzo `./exec` per il run, nativo per g++. 
 
 
 
