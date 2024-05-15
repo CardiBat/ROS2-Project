@@ -663,13 +663,12 @@ As a result, the package has been completely compiled and we can proceed with th
 
 We have thus managed to install the `rclcpp` library almost entirely along with all its dependencies. We must now try to create working C++ nodes to demonstrate its functionality.
 
-### [Optional] Recursive Addition of Variables to the PATH for Each Package
+### [IMPORTANT NOTE] Recursive Addition of Variables to the PATH for Each Package
 
-Since easy-to-use commands like `ros2` are not available and we must proceed manually, it is possible to simplify the work by adding all the environmental variables to avoid specifying paths during the compilation of nodes that will be created with `rclcpp`:
-
+In each new session, sourcing-export is required, so execute these 3 commands:
 ```sh
+source ~/.bashrc
 export CPLUS_INCLUDE_PATH=$(find /home/fsimoni/ros2_foxy_ws/install -type d -name include | paste -sd ":" -):${CPLUS_INCLUDE_PATH}
-
 export LD_LIBRARY_PATH=$(find /home/fsimoni/ros2_foxy_ws/install -type d -name lib | paste -sd ":" -):${LD_LIBRARY_PATH}
 ```
 
@@ -806,7 +805,151 @@ The output then displays a node capable of listening for potential sensor signal
 </div>
 <p>&nbsp;</p>
 
-[NOTE]:
+
+### Creation of Complex and Communicating Nodes via Topic (pub-sub)
+
+Let's create a 'client' node (publisher) composed as follows:
+
+```
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/int32.hpp"
+
+class ClientNode : public rclcpp::Node
+{
+public:
+    ClientNode() : Node("client_node")
+    {
+    	// creating publisher
+        publisher_ = this->create_publisher<std_msgs::msg::Int32>("server_topic", 10);
+        
+        // wall timer doing callback every 5s
+        timer_ = this->create_wall_timer(
+            std::chrono::seconds(5), 
+            std::bind(&ClientNode::send_message, this) 
+        );
+	
+	// start log
+        RCLCPP_INFO(this->get_logger(), "Client node started.");
+    }
+
+private:
+    void send_message()
+    {
+    	// sending messages (2 types)
+        auto message = std_msgs::msg::Int32();
+        message.data = 1; // switch 1 or 2 --> HW connected if needed (KEYBOARD)
+        
+        RCLCPP_INFO(this->get_logger(), "Info requested: %d", message.data);
+        publisher_->publish(message);
+    }
+
+    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr publisher_;
+    rclcpp::TimerBase::SharedPtr timer_;
+};
+
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+    auto node = std::make_shared<ClientNode>();
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+```
+This node has two selectable modes:
+- In mode 1, it requests the external temperature (publish) on the topic
+- In mode 2, it requests the external pressure (publish) on the topic  
+
+Executable with: 
+
+```
+g++ -o client src/my_package_4/client.cpp -I/home/fsimoni/ros2_foxy_ws/install/rclcpp/include -I/home/fsimoni/ros2_foxy_ws/install/rcutils/include -I/home/fsimoni/ros2_foxy_ws/install/rcl/include -I/home/fsimoni/ros2_foxy_ws/install/tracetools/include -I/home/fsimoni/ros2_foxy_ws/install/rmw/include -I/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/include -I/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/include -I/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/include -I/home/fsimoni/ros2_foxy_ws/install/rcpputils/include -I/home/fsimoni/ros2_foxy_ws/install/std_msgs/include -I/home/fsimoni/ros2_foxy_ws/install/builtin_interfaces/include -I/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_cpp/include -I/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/include -L/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib -L/home/fsimoni/ros2_foxy_ws/install/rcutils/lib -L/home/fsimoni/ros2_foxy_ws/install/rcl/lib -L/home/fsimoni/ros2_foxy_ws/install/tracetools/lib -L/home/fsimoni/ros2_foxy_ws/install/rmw/lib -L/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/lib -L/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/lib -L/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/lib -L/home/fsimoni/ros2_foxy_ws/install/rcpputils/lib -L/home/fsimoni/ros2_foxy_ws/install/statistics_msgs/lib -L/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/lib -L/home/fsimoni/ros2_foxy_ws/install/std_msgs/lib -L/home/fsimoni/ros2_foxy_ws/install/rosgraph_msgs/lib -L/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_cpp/lib -L/home/fsimoni/ros2_foxy_ws/install/libstatistics_collector/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcutils/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/tracetools/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rmw/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcpputils/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/statistics_msgs/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/std_msgs/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosgraph_msgs/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_cpp/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/libstatistics_collector/lib -lrclcpp -lrcutils -lrcl -ltracetools -lrmw -lrosidl_runtime_c -lrcl_yaml_param_parser -lrcpputils -lstatistics_msgs__rosidl_typesupport_cpp -lstd_msgs__rosidl_typesupport_cpp -lrosgraph_msgs__rosidl_typesupport_cpp -lrosidl_typesupport_cpp -lstdc++fs -pthread -llibstatistics_collector
+```
+
+Let's also create the server node (subscriber):
+
+```
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/int32.hpp>
+
+class ServerNode : public rclcpp::Node
+{
+public:
+    ServerNode() : Node("server_node")
+    {
+        subscription_ = this->create_subscription<std_msgs::msg::Int32>(
+            "server_topic", 10, std::bind(&ServerNode::handle_message, this, std::placeholders::_1));
+    }
+
+private:
+    void handle_message(const std_msgs::msg::Int32::SharedPtr msg)
+    {
+        int result = 0;
+        if (msg->data == 1)
+        {
+            result = function1();
+        }
+        else if (msg->data == 2)
+        {
+            result = function2();
+        }
+        else
+        {
+            RCLCPP_WARN(this->get_logger(), "Received unsupported value: %d", msg->data);
+            return;
+        }
+
+        RCLCPP_INFO(this->get_logger(), "Function result: %d", result);
+    }
+
+    int function1()
+    {
+        RCLCPP_INFO(this->get_logger(), "Executing function1");
+        return 10; // valore di ritorno di esempio
+    }
+
+    int function2()
+    {
+        RCLCPP_INFO(this->get_logger(), "Executing function2");
+        return 20; // valore di ritorno di esempio
+    }
+
+    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr subscription_;
+};
+
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+    auto node = std::make_shared<ServerNode>();
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+```
+This node receives messages from the publisher node and responds according to the type:
+- 1 --> temperature
+- 2 --> pressure
+
+
+Executable with:
+
+```
+g++ -o server src/my_package_4/server.cpp -I/home/fsimoni/ros2_foxy_ws/install/rclcpp/include -I/home/fsimoni/ros2_foxy_ws/install/rcutils/include -I/home/fsimoni/ros2_foxy_ws/install/rcl/include -I/home/fsimoni/ros2_foxy_ws/install/tracetools/include -I/home/fsimoni/ros2_foxy_ws/install/rmw/include -I/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/include -I/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/include -I/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/include -I/home/fsimoni/ros2_foxy_ws/install/rcpputils/include -I/home/fsimoni/ros2_foxy_ws/install/std_msgs/include -I/home/fsimoni/ros2_foxy_ws/install/builtin_interfaces/include -I/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_cpp/include -I/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/include -L/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib -L/home/fsimoni/ros2_foxy_ws/install/rcutils/lib -L/home/fsimoni/ros2_foxy_ws/install/rcl/lib -L/home/fsimoni/ros2_foxy_ws/install/tracetools/lib -L/home/fsimoni/ros2_foxy_ws/install/rmw/lib -L/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/lib -L/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/lib -L/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/lib -L/home/fsimoni/ros2_foxy_ws/install/rcpputils/lib -L/home/fsimoni/ros2_foxy_ws/install/statistics_msgs/lib -L/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/lib -L/home/fsimoni/ros2_foxy_ws/install/std_msgs/lib -L/home/fsimoni/ros2_foxy_ws/install/rosgraph_msgs/lib -L/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_cpp/lib -L/home/fsimoni/ros2_foxy_ws/install/libstatistics_collector/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcutils/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/tracetools/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rmw/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcpputils/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/statistics_msgs/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/std_msgs/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosgraph_msgs/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_cpp/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/libstatistics_collector/lib -lrclcpp -lrcutils -lrcl -ltracetools -lrmw -lrosidl_runtime_c -lrcl_yaml_param_parser -lrcpputils -lstatistics_msgs__rosidl_typesupport_cpp -lstd_msgs__rosidl_typesupport_cpp -lrosgraph_msgs__rosidl_typesupport_cpp -lrosidl_typesupport_cpp -lstdc++fs -pthread -llibstatistics_collector
+```
+
+Here below is the image demonstrating the interaction between them:
+
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
+</div>
+<p>&nbsp;</p>
+
+This demonstrates how communication between nodes in RISC-V occurs without problems and, of course, is extendable in hardware by connecting, for example, the server node to temperature/pressure sensors. In turn, the client node can be connected to a physical switch for mode change (or pre-programmed). Finally, note that this paradigm is not strictly client-server but is pub-sub, which means that the server's responses need to be read on other nodes if one wants to act accordingly in the application (e.g., raising the temperature with appropriate devices connected to the new nodes).
+
+
+
+### [NOTE]:
 The reason we add various paths at each compilation is because we have not installed ROS2 on CISC, and thus classic commands such as:
 
 ```sh
