@@ -956,7 +956,7 @@ Qui sotto vi è l'immagine che dimostra l'interazione tra essi:
 
 <p>&nbsp;</p>
 <div align="center">
-  <img src="/nodi_comunicanti" alt="nodi_comunicanti.png">
+  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
 </div>
 <p>&nbsp;</p>
 
