@@ -978,6 +978,8 @@ Dopo aver runnato entrambi i nodi, ricercarli tramite filtro:
 - Premere f4 (filter)
 - Incollare (Ctrl-alt-V) il seguente filtro dei nodi: client|server. Premere quindi invio.
 
+_Ricordiamoci infine che la macchina che stiamo utilizzando ha 4 core SiFive U74-MC da 1.5GHz di clock e 16GB di RAM_
+
 ### Benchmarking delle risorse durante l'installazione dei pacchetti di ROS2
 
 ### Benchmarking delle risorse a run-time al variare dell'intensità di comunicazione
