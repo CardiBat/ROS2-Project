@@ -1349,17 +1349,6 @@ _In entrambi i casi_, la RAM occupata è pari a 100MB circa.
 <p>&nbsp;</p>
 
 
-
-
-
-
-
-
-I risultati ottenuti quindi uguale ram con pochi o tanti messaggi ma cpu cambia signfiicativamente. per capire anche ram mettiamo valori reali quindi messaggi da 400kb.
-
-modifichiamo quindi il client e il server in modo tale che si scambino questi messaggi più pesanti:
-
-
 ## Conclusioni
 
 ### Obiettivo di porting soddisfatto
