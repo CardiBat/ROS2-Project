@@ -1304,14 +1304,14 @@ Procedendo al benchmarking nel caso di scambio di interi (come avevamo prima) si
 - Nel caso di scambi di messaggi poco frequente (circa 10 al secondo) un basso utilizzo della CPU pari a 2.8%
 <p>&nbsp;</p>
 <div align="center">
-  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
+  <img src="/nodi_comunicanti.png" alt="100ms-int.png">
 </div>
 <p>&nbsp;</p>
 
 - Nel caso di scambi reale (200 al secondo) 14%, circa 4 volte in più
 <p>&nbsp;</p>
 <div align="center">
-  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
+  <img src="/nodi_comunicanti.png" alt="cpu-5ms-int.png">
 </div>
 <p>&nbsp;</p>
 
@@ -1319,7 +1319,7 @@ _In entrambi i casi_, la RAM occupata è pari a 50MB
 
 <p>&nbsp;</p>
 <div align="center">
-  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
+  <img src="/nodi_comunicanti.png" alt="ram-int.png">
 </div>
 <p>&nbsp;</p>
 
@@ -1330,21 +1330,21 @@ Procedendo invece con scambi di messaggi a 400KB, si ottiene:
 - Nel caso di scambi di messaggi poco frequente (circa 10 al secondo) un basso utilizzo della CPU pari a 42.9%
 <p>&nbsp;</p>
 <div align="center">
-  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
+  <img src="/nodi_comunicanti.png" alt="cpu-100ms-400kb.png">
 </div>
 <p>&nbsp;</p>
 
 - Nel caso di scambi reale (200 al secondo) 168%, anche qui circa 4 volte in più. Da notare che necessita quindi di un altro core.
 <p>&nbsp;</p>
 <div align="center">
-  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
+  <img src="/nodi_comunicanti.png" alt="cpu-5ms-400kb.png">
 </div>
 <p>&nbsp;</p>
 
 _In entrambi i casi_, la RAM occupata è pari a 100MB circa.
 <p>&nbsp;</p>
 <div align="center">
-  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
+  <img src="/nodi_comunicanti.png" alt="ram-400kb.png">
 </div>
 <p>&nbsp;</p>
 
