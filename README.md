@@ -864,7 +864,7 @@ Questo nodo ha due modalità selezionabili:
 - In modalità 1 richiede la temperatura esterna (publish) sul topic
 - In modalità 2 richiede la pressione esterna (publish) sul topic  
 
-Eseguibile con:
+Compilabile con:
 
 ```
 g++ -o client src/my_package_4/client.cpp -I/home/fsimoni/ros2_foxy_ws/install/rclcpp/include -I/home/fsimoni/ros2_foxy_ws/install/rcutils/include -I/home/fsimoni/ros2_foxy_ws/install/rcl/include -I/home/fsimoni/ros2_foxy_ws/install/tracetools/include -I/home/fsimoni/ros2_foxy_ws/install/rmw/include -I/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/include -I/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/include -I/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/include -I/home/fsimoni/ros2_foxy_ws/install/rcpputils/include -I/home/fsimoni/ros2_foxy_ws/install/std_msgs/include -I/home/fsimoni/ros2_foxy_ws/install/builtin_interfaces/include -I/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_cpp/include -I/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/include -L/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib -L/home/fsimoni/ros2_foxy_ws/install/rcutils/lib -L/home/fsimoni/ros2_foxy_ws/install/rcl/lib -L/home/fsimoni/ros2_foxy_ws/install/tracetools/lib -L/home/fsimoni/ros2_foxy_ws/install/rmw/lib -L/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/lib -L/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/lib -L/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/lib -L/home/fsimoni/ros2_foxy_ws/install/rcpputils/lib -L/home/fsimoni/ros2_foxy_ws/install/statistics_msgs/lib -L/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/lib -L/home/fsimoni/ros2_foxy_ws/install/std_msgs/lib -L/home/fsimoni/ros2_foxy_ws/install/rosgraph_msgs/lib -L/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_cpp/lib -L/home/fsimoni/ros2_foxy_ws/install/libstatistics_collector/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcutils/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/tracetools/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rmw/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcpputils/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/statistics_msgs/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/std_msgs/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosgraph_msgs/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_cpp/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/libstatistics_collector/lib -lrclcpp -lrcutils -lrcl -ltracetools -lrmw -lrosidl_runtime_c -lrcl_yaml_param_parser -lrcpputils -lstatistics_msgs__rosidl_typesupport_cpp -lstd_msgs__rosidl_typesupport_cpp -lrosgraph_msgs__rosidl_typesupport_cpp -lrosidl_typesupport_cpp -lstdc++fs -pthread -llibstatistics_collector
@@ -937,7 +937,7 @@ Questo nodo riceve messaggi dal nodo publisher e a seconda della tipologia rispo
 
 
 
-Eseguibile con:
+Compilabile con:
 
 ```
 g++ -o server src/my_package_4/server.cpp -I/home/fsimoni/ros2_foxy_ws/install/rclcpp/include -I/home/fsimoni/ros2_foxy_ws/install/rcutils/include -I/home/fsimoni/ros2_foxy_ws/install/rcl/include -I/home/fsimoni/ros2_foxy_ws/install/tracetools/include -I/home/fsimoni/ros2_foxy_ws/install/rmw/include -I/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/include -I/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/include -I/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/include -I/home/fsimoni/ros2_foxy_ws/install/rcpputils/include -I/home/fsimoni/ros2_foxy_ws/install/std_msgs/include -I/home/fsimoni/ros2_foxy_ws/install/builtin_interfaces/include -I/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_cpp/include -I/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/include -L/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib -L/home/fsimoni/ros2_foxy_ws/install/rcutils/lib -L/home/fsimoni/ros2_foxy_ws/install/rcl/lib -L/home/fsimoni/ros2_foxy_ws/install/tracetools/lib -L/home/fsimoni/ros2_foxy_ws/install/rmw/lib -L/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/lib -L/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/lib -L/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/lib -L/home/fsimoni/ros2_foxy_ws/install/rcpputils/lib -L/home/fsimoni/ros2_foxy_ws/install/statistics_msgs/lib -L/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/lib -L/home/fsimoni/ros2_foxy_ws/install/std_msgs/lib -L/home/fsimoni/ros2_foxy_ws/install/rosgraph_msgs/lib -L/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_cpp/lib -L/home/fsimoni/ros2_foxy_ws/install/libstatistics_collector/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rclcpp/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcutils/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/tracetools/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rmw/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_runtime_c/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_interface/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl_yaml_param_parser/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcpputils/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/statistics_msgs/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rcl_interfaces/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/std_msgs/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosgraph_msgs/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/rosidl_typesupport_cpp/lib -Wl,-rpath,/home/fsimoni/ros2_foxy_ws/install/libstatistics_collector/lib -lrclcpp -lrcutils -lrcl -ltracetools -lrmw -lrosidl_runtime_c -lrcl_yaml_param_parser -lrcpputils -lstatistics_msgs__rosidl_typesupport_cpp -lstd_msgs__rosidl_typesupport_cpp -lrosgraph_msgs__rosidl_typesupport_cpp -lrosidl_typesupport_cpp -lstdc++fs -pthread -llibstatistics_collector
@@ -972,7 +972,6 @@ Le colonne che ci interessano sono:
 
 - Utilizzo della CPU (%CPU): Verifica se il processo richiede molto tempo di CPU.
 - Memoria Residente (RES): La quantità di RAM effettivamente utilizzata dal processo.
-- Memoria Virtuale (VIRT): Indica la memoria totale che potrebbe essere allocata dal processo, compresa la memoria non residente (e quindi anche quella condivisa con altri processi e quella riservata ma non utilizzata).
 
 Dopo aver runnato entrambi i nodi, ricercarli tramite filtro:
 
@@ -1048,7 +1047,22 @@ Dopo aver avviato anche il subscriber e quindi l'interazione è cominciata, si p
 htop -p $(pgrep -d',' -f 'client_node|server_node')
 ```
 
+Oppure, per essere più accurati, si può runnare:
+```sh
+ps aux | grep -E 'client_node|server_node' | grep -v grep | awk '{sum += $6} END {print sum/1024 " MB"}'
+```
 
+Da notare che conviene, a tempo di compilazione, dare nomi specifici ai nodi da runnare per evitare che il comando di ps ricerchi altri processi con nomi simili.  
+
+Prima di procedere con il benchmarking, bisogna scegliere le frequenze di scambi di messaggi da testare. Normalmente, un robot mobile possiede questa configurazione:
+
+- LiDAR: 2 sensori a 10 Hz, 0.05MB ogni messaggio
+- Camera: 2 camere a 30 Hz, 1.5MB ogni messaggio
+- Inertial Measurement Unit (IMU): 1 sensore a 100 Hz, 0.0005MB ogni messaggio
+- Sensori di distanza: 4 sensori a 10 Hz, 0.0005MB ogni messaggio
+- Sensori di temperatura: 2 sensori a 1 Hz, 0.0005MB ogni messaggio
+
+Di conseguenza vengono circa scambiati 220 messaggi al secondo, con un peso totale di circa 90MB al secondo. Per semplificare, possiamo quindi dire che ogni messaggio pesa circa 0.4MB.
 
 
 ## Conclusioni
