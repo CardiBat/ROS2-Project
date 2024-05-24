@@ -987,27 +987,24 @@ Per poter ottenere informazioni sulle risorse necessarie a tempo di esecuzione d
 ```
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/int32.hpp"
+#include <cstdlib>
 
 class ClientNode : public rclcpp::Node
 {
 public:
-    ClientNode() : Node("client_node")
+    ClientNode(int publish_frequency_ms) : Node("client_node")
     {
-        // Ottenere la frequenza di pubblicazione dai parametri
-        this->declare_parameter<int>("publish_frequency", 1);
-        int publish_frequency = this->get_parameter("publish_frequency").as_int();
-
         // Creare il publisher
         publisher_ = this->create_publisher<std_msgs::msg::Int32>("server_topic", 10);
 
         // Creare il timer con la frequenza configurabile
         timer_ = this->create_wall_timer(
-            std::chrono::seconds(publish_frequency), 
+            std::chrono::milliseconds(publish_frequency_ms), 
             std::bind(&ClientNode::send_message, this)
         );
 
         // Iniziare log
-        RCLCPP_INFO(this->get_logger(), "Client node started with frequency: %d seconds", publish_frequency);
+        RCLCPP_INFO(this->get_logger(), "Client node started with frequency: %d ms", publish_frequency_ms);
     }
 
 private:
@@ -1028,11 +1025,24 @@ private:
 int main(int argc, char *argv[])
 {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<ClientNode>();
+
+    // Controlla se è stato passato un argomento
+    if (argc < 2) {
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Usage: client_node <publish_frequency_ms>");
+        return 1;
+    }
+
+    // Converti l'argomento in intero
+    int publish_frequency_ms = std::atoi(argv[1]);
+
+    // Creare il nodo con la frequenza di pubblicazione specificata
+    auto node = std::make_shared<ClientNode>(publish_frequency_ms);
+
     rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;
 }
+
 ```
 
 A questo punto, dopo aver compilato, è possibile runnare il nodo publisher passando il parametro di frequenza (s)
