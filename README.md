@@ -1124,12 +1124,12 @@ A questo punto, dopo aver compilato, è possibile runnare il nodo publisher pass
 Dopo aver avviato anche il subscriber e quindi l'interazione è cominciata, si può vedere a terminale la gestione delle risorse specifica per questi due nodi tramite il comando htop personalizzato che trova i pid dei processi e monitora solo loro:
 
 ```sh
-htop -p $(pgrep -d',' -f 'client_node|server_node')
+htop -p $(pgrep -d',' -f 'client_benchmark|server_benchmark')
 ```
 
 Oppure, per essere più accurati, si può runnare:
 ```sh
-ps aux | grep -E 'client_node|server_node' | grep -v grep | awk '{sum += $6} END {print sum/1024 " MB"}'
+ps aux | grep -E 'client_benchmark|server_benchmark' | grep -v grep | awk '{sum += $6} END {print sum/1024 " MB"}'
 ```
 
 Da notare che conviene, a tempo di compilazione, dare nomi specifici ai nodi da runnare per evitare che il comando di ps ricerchi altri processi con nomi simili.  
