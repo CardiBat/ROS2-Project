@@ -1115,10 +1115,10 @@ int main(int argc, char *argv[])
 
 
 
-A questo punto, dopo aver compilato, è possibile runnare il nodo publisher passando il parametro di frequenza (s)
+A questo punto, dopo aver compilato, è possibile runnare il nodo publisher passando il parametro di frequenza (s) con 5ms = circa 200 messaggi al secondo
 
 ```sh
-./client_node --ros-args -p publish_frequency:=1
+./client_benchmark 5 &
 ```
 
 Dopo aver avviato anche il subscriber e quindi l'interazione è cominciata, si può vedere a terminale la gestione delle risorse specifica per questi due nodi tramite il comando htop personalizzato che trova i pid dei processi e monitora solo loro:
@@ -1127,10 +1127,16 @@ Dopo aver avviato anche il subscriber e quindi l'interazione è cominciata, si p
 htop -p $(pgrep -d',' -f 'client_benchmark|server_benchmark')
 ```
 
-Oppure, per essere più accurati, si può runnare:
+Oppure, per essere più accurati, si può runnare (per la RAM):
 ```sh
 ps aux | grep -E 'client_benchmark|server_benchmark' | grep -v grep | awk '{sum += $6} END {print sum/1024 " MB"}'
 ```
+E per la CPU
+```sh
+ps aux | grep -E 'client_benchmark|server_benchmark' | grep -v grep | awk '{sum += $3} END {print sum " %"}'
+```
+
+
 
 Da notare che conviene, a tempo di compilazione, dare nomi specifici ai nodi da runnare per evitare che il comando di ps ricerchi altri processi con nomi simili.  
 
@@ -1142,7 +1148,216 @@ Prima di procedere con il benchmarking, bisogna scegliere le frequenze di scambi
 - Sensori di distanza: 4 sensori a 10 Hz, 0.0005MB ogni messaggio
 - Sensori di temperatura: 2 sensori a 1 Hz, 0.0005MB ogni messaggio
 
-Di conseguenza vengono circa scambiati 220 messaggi al secondo, con un peso totale di circa 90MB al secondo. Per semplificare, possiamo quindi dire che ogni messaggio pesa circa 0.4MB.
+Di conseguenza vengono circa scambiati 220 messaggi al secondo, con un peso totale di circa 90MB al secondo. Per semplificare, possiamo quindi dire che ogni messaggio peserebbe circa 0.4MB.  
+
+Si utilizzeranno quindi altri 2 nodi modificati sulla base di queste specifiche:
+
+client
+```
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/string.hpp"
+#include <cstdlib>
+#include <string>
+
+class ClientNode : public rclcpp::Node
+{
+public:
+    ClientNode(int publish_frequency_ms) : Node("client_node")
+    {
+        // Creare il publisher
+        publisher_ = this->create_publisher<std_msgs::msg::String>("server_topic", 10);
+
+        // Creare il timer con la frequenza configurabile
+        timer_ = this->create_wall_timer(
+            std::chrono::milliseconds(publish_frequency_ms), 
+            std::bind(&ClientNode::send_message, this)
+        );
+
+        // Iniziare log
+        RCLCPP_INFO(this->get_logger(), "Client node started with frequency: %d ms", publish_frequency_ms);
+    }
+
+private:
+    void send_message()
+    {
+        // Creare un messaggio di 0.4 MB
+        auto message = std_msgs::msg::String();
+        message.data = std::string(400 * 1024, '0'); // Stringa di 400 KB
+
+        // Pubblicare il messaggio
+        publisher_->publish(message);
+    }
+
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+    rclcpp::TimerBase::SharedPtr timer_;
+};
+
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+
+    // Controlla se    stato passato un argomento
+    if (argc < 2) {
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Usage: client_node <publish_frequency_ms>");
+        return 1;
+    }
+
+    // Converti l'argomento in intero
+    int publish_frequency_ms = std::atoi(argv[1]);
+
+    // Verifica che l'argomento sia valido
+    if (publish_frequency_ms <= 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Invalid publish frequency: %d ms", publish_frequency_ms);
+        return 1;
+    }
+
+    // Creare il nodo con la frequenza di pubblicazione specificata
+    auto node = std::make_shared<ClientNode>(publish_frequency_ms);
+
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+```
+
+server
+```
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/int32.hpp>
+#include <std_msgs/msg/string.hpp>
+#include <fstream>
+
+class ServerNode : public rclcpp::Node
+{
+public:
+    ServerNode(std::shared_ptr<std::ofstream> log_file) 
+        : Node("server_node"), log_file_(log_file)
+    {
+        subscription_int_ = this->create_subscription<std_msgs::msg::Int32>(
+            "server_topic", 10, std::bind(&ServerNode::handle_int_message, this, std::placeholders::_1));
+
+        subscription_string_ = this->create_subscription<std_msgs::msg::String>(
+            "server_topic", 10, std::bind(&ServerNode::handle_string_message, this, std::placeholders::_1));
+    }
+
+private:
+    void handle_int_message(const std_msgs::msg::Int32::SharedPtr msg)
+    {
+        int result = 0;
+        if (msg->data == 1)
+        {
+            result = function1();
+        }
+        else if (msg->data == 2)
+        {
+            result = function2();
+        }
+        else
+        {
+            *log_file_ << "Received unsupported value: " << msg->data << std::endl;
+            return;
+        }
+
+        *log_file_ << "Function result: " << result << std::endl;
+    }
+
+    void handle_string_message(const std_msgs::msg::String::SharedPtr msg)
+    {
+        // Log del messaggio ricevuto
+        *log_file_ << "Received string message of size: " << msg->data.size() << " bytes" << std::endl;
+    }
+
+    int function1()
+    {
+        *log_file_ << "Executing function1" << std::endl;
+        return 10; // valore di ritorno di esempio
+    }
+
+    int function2()
+    {
+        *log_file_ << "Executing function2" << std::endl;
+        return 20; // valore di ritorno di esempio
+    }
+
+    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr subscription_int_;
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_string_;
+    std::shared_ptr<std::ofstream> log_file_;
+};
+
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+
+    // Apri il file di log
+    auto log_file = std::make_shared<std::ofstream>("/home/fsimoni/ros2_foxy_ws/output.txt", std::ios_base::app);
+
+    auto node = std::make_shared<ServerNode>(log_file);
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+
+```
+
+Procedendo al benchmarking nel caso di scambio di interi (come avevamo prima) si ottiene:
+
+- Nel caso di scambi di messaggi poco frequente (circa 10 al secondo) un basso utilizzo della CPU pari a 2.8%
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
+</div>
+<p>&nbsp;</p>
+
+- Nel caso di scambi reale (200 al secondo) 14%, circa 4 volte in più
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
+</div>
+<p>&nbsp;</p>
+
+_In entrambi i casi_, la RAM occupata è pari a 50MB
+
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
+</div>
+<p>&nbsp;</p>
+
+
+
+Procedendo invece con scambi di messaggi a 400KB, si ottiene:
+
+- Nel caso di scambi di messaggi poco frequente (circa 10 al secondo) un basso utilizzo della CPU pari a 42.9%
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
+</div>
+<p>&nbsp;</p>
+
+- Nel caso di scambi reale (200 al secondo) 168%, anche qui circa 4 volte in più. Da notare che necessita quindi di un altro core.
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
+</div>
+<p>&nbsp;</p>
+
+_In entrambi i casi_, la RAM occupata è pari a 100MB circa.
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/nodi_comunicanti.png" alt="nodi_comunicanti.png">
+</div>
+<p>&nbsp;</p>
+
+
+
+
+
+
+
+
+I risultati ottenuti quindi uguale ram con pochi o tanti messaggi ma cpu cambia signfiicativamente. per capire anche ram mettiamo valori reali quindi messaggi da 400kb.
+
+modifichiamo quindi il client e il server in modo tale che si scambino questi messaggi più pesanti:
 
 
 ## Conclusioni
