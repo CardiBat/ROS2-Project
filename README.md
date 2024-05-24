@@ -982,15 +982,9 @@ Dopo aver runnato entrambi i nodi, ricercarli tramite filtro:
 
 ### Benchmarking delle risorse a run-time al variare dell'intensità di comunicazione
 
-Per poter ottenere informazioni sulle risorse necessarie a tempo di esecuzione del programma, si rende necessaria la modifica del codice in modo tale che sia possibile cambiare la frequenza di invio di messaggi durante la run (e non dover ricompilare ogni volta). Si modifica quindi il nodo publisher rispettando questa specifica.
+Per poter ottenere informazioni sulle risorse necessarie a tempo di esecuzione del programma, si rende necessaria la modifica del codice in modo tale che sia possibile cambiare la frequenza di invio di messaggi durante la run (e non dover ricompilare ogni volta). Si modifica quindi il nodo publisher rispettando questa specifica (ed evitando di stampare a terminale in entrambi i nodi).
 
 ```
-#include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/int32.hpp"
-#include <cstdlib>
-
-class ClientNode : public rclcpp::Node
-{
 public:
     ClientNode(int publish_frequency_ms) : Node("client_node")
     {
@@ -1014,7 +1008,6 @@ private:
         auto message = std_msgs::msg::Int32();
         message.data = 1; // Cambiare a 2 se necessario
 
-        RCLCPP_INFO(this->get_logger(), "Info requested: %d", message.data);
         publisher_->publish(message);
     }
 
@@ -1026,7 +1019,7 @@ int main(int argc, char *argv[])
 {
     rclcpp::init(argc, argv);
 
-    // Controlla se è stato passato un argomento
+    // Controlla se    stato passato un argomento
     if (argc < 2) {
         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Usage: client_node <publish_frequency_ms>");
         return 1;
@@ -1034,6 +1027,12 @@ int main(int argc, char *argv[])
 
     // Converti l'argomento in intero
     int publish_frequency_ms = std::atoi(argv[1]);
+
+    // Verifica che l'argomento sia valido
+    if (publish_frequency_ms <= 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Invalid publish frequency: %d ms", publish_frequency_ms);
+        return 1;
+    }
 
     // Creare il nodo con la frequenza di pubblicazione specificata
     auto node = std::make_shared<ClientNode>(publish_frequency_ms);
@@ -1043,7 +1042,78 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+
 ```
+
+Il nodo server invece stampa su file per controllare che vada tutto ok:
+```
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/int32.hpp>
+#include <fstream>
+
+class ServerNode : public rclcpp::Node
+{
+public:
+    ServerNode(std::shared_ptr<std::ofstream> log_file) 
+        : Node("server_node"), log_file_(log_file)
+    {
+        subscription_ = this->create_subscription<std_msgs::msg::Int32>(
+            "server_topic", 10, std::bind(&ServerNode::handle_message, this, std::placeholders::_1));
+    }
+
+private:
+    void handle_message(const std_msgs::msg::Int32::SharedPtr msg)
+    {
+        int result = 0;
+        if (msg->data == 1)
+        {
+            result = function1();
+        }
+        else if (msg->data == 2)
+        {
+            result = function2();
+        }
+        else
+        {
+            *log_file_ << "Received unsupported value: " << msg->data << std::endl;
+            return;
+        }
+
+        *log_file_ << "Function result: " << result << std::endl;
+    }
+
+    int function1()
+    {
+        *log_file_ << "Executing function1" << std::endl;
+        return 10; // valore di ritorno di esempio
+    }
+
+    int function2()
+    {
+        *log_file_ << "Executing function2" << std::endl;
+        return 20; // valore di ritorno di esempio
+    }
+
+    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr subscription_;
+    std::shared_ptr<std::ofstream> log_file_;
+};
+
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+
+    // Apri il file di log
+    auto log_file = std::make_shared<std::ofstream>("/home/fsimoni/ros2_foxy_ws/output.txt", std::ios_base::app);
+
+    auto node = std::make_shared<ServerNode>(log_file);
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+
+```
+
+
 
 A questo punto, dopo aver compilato, è possibile runnare il nodo publisher passando il parametro di frequenza (s)
 
