@@ -964,6 +964,92 @@ ros2 run my_package_2 my_node_2
 Di fatti `ros2` non verrebbe trovato. Specifico quindi a compilazione dove cercare le librerie compilate e le altre esterne necessarie in modo tale di non incontrare problemi se utilizzo `./exec` per il run, nativo per g++. 
 
 
+## Benchmarking delle prestazioni
+
+Si rende ora necessario poter monitorare le risorse richieste durante l'esecuzione (per un futuro export su FPGA ad esempio). Per non dover ricorrere ad altre installazioni esterne alla macchina (che potrebbero portare via molto tempo e potrebbero risultare incompatibili), si utilizza htop dopo le run delle macchine per poter monitorare queste informazioni. 
+
+Le colonne che ci interessano sono:
+
+- Utilizzo della CPU (%CPU): Verifica se il processo richiede molto tempo di CPU.
+- Memoria Residente (RES): La quantità di RAM effettivamente utilizzata dal processo.
+- Memoria Virtuale (VIRT): Indica la memoria totale che potrebbe essere allocata dal processo, compresa la memoria non residente (e quindi anche quella condivisa con altri processi e quella riservata ma non utilizzata).
+
+Dopo aver runnato entrambi i nodi, ricercarli tramite filtro:
+
+- Premere f4 (filter)
+- Incollare (Ctrl-alt-V) il seguente filtro dei nodi: client|server. Premere quindi invio.
+
+### Benchmarking delle risorse durante l'installazione dei pacchetti di ROS2
+
+### Benchmarking delle risorse a run-time al variare dell'intensità di comunicazione
+
+Per poter ottenere informazioni sulle risorse necessarie a tempo di esecuzione del programma, si rende necessaria la modifica del codice in modo tale che sia possibile cambiare la frequenza di invio di messaggi durante la run (e non dover ricompilare ogni volta). Si modifica quindi il nodo publisher rispettando questa specifica.
+
+```
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/int32.hpp"
+
+class ClientNode : public rclcpp::Node
+{
+public:
+    ClientNode() : Node("client_node")
+    {
+        // Ottenere la frequenza di pubblicazione dai parametri
+        this->declare_parameter<int>("publish_frequency", 1);
+        int publish_frequency = this->get_parameter("publish_frequency").as_int();
+
+        // Creare il publisher
+        publisher_ = this->create_publisher<std_msgs::msg::Int32>("server_topic", 10);
+
+        // Creare il timer con la frequenza configurabile
+        timer_ = this->create_wall_timer(
+            std::chrono::seconds(publish_frequency), 
+            std::bind(&ClientNode::send_message, this)
+        );
+
+        // Iniziare log
+        RCLCPP_INFO(this->get_logger(), "Client node started with frequency: %d seconds", publish_frequency);
+    }
+
+private:
+    void send_message()
+    {
+        // Inviare messaggi (2 tipi)
+        auto message = std_msgs::msg::Int32();
+        message.data = 1; // Cambiare a 2 se necessario
+
+        RCLCPP_INFO(this->get_logger(), "Info requested: %d", message.data);
+        publisher_->publish(message);
+    }
+
+    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr publisher_;
+    rclcpp::TimerBase::SharedPtr timer_;
+};
+
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+    auto node = std::make_shared<ClientNode>();
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+```
+
+A questo punto, dopo aver compilato, è possibile runnare il nodo publisher passando il parametro di frequenza (s)
+
+```sh
+./client_node --ros-args -p publish_frequency:=1
+```
+
+Dopo aver avviato anche il subscriber e quindi l'interazione è cominciata, si può vedere a terminale la gestione delle risorse specifica per questi due nodi tramite il comando htop personalizzato che trova i pid dei processi e monitora solo loro:
+
+```sh
+htop -p $(pgrep -d',' -f 'client_node|server_node')
+```
+
+
+
 
 ## Conclusioni
 
