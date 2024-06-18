@@ -1361,6 +1361,9 @@ Si procede dunque a capire i consumi in termini di memoria/CPU a tempo di compil
 </div>
 <p>&nbsp;</p>
 
+A questo punto, conviene creare un ambiente completamente nuovo clonando i sorgenti modificati in `src` nella nuova cartella. Creare quindi nuovamente una dir `build` e testarne il funzionamento tramite compilazione `colcon` (come all'inizio). 
+
+Si inizia quindi ad analizzare i consumi durante la compilazione e stampando su un log file i risultati ottenuti:
 
 
 
@@ -1370,7 +1373,7 @@ Si procede dunque a capire i consumi in termini di memoria/CPU a tempo di compil
 
 Durante questo progetto abbiamo approfondito e navigato attraverso la complessa esperienza di porting di ROS2 su un'architettura RISC-V, scoprendo sfide tecniche e cercando varie soluzioni possibili. Durante questo percorso, siamo riusciti a superare diversi ostacoli, adattando ROS a un ambiente non supportato, dimostrandone la possibilità di realizzazione.
 
-Dopo aver quindi spiegato il funzionamento di ROS e dopo un'analisi del modo in cui viene utilizzato su Ubuntu, ci siamo immersi su RISC-V provando la compilazione di un pacchetto per la creazione di nodi. L'esito è andato a buon fine e siamo riusciti a creare nodi di esempio completamente funzionanti. 
+Dopo aver quindi spiegato il funzionamento di ROS e dopo un'analisi del modo in cui viene utilizzato su Ubuntu, ci siamo immersi su RISC-V provando la compilazione di un pacchetto per la creazione di nodi. L'esito è andato a buon fine e siamo riusciti a creare nodi di esempio completamente funzionanti. Abbiamo quindi dimostrato che è possibile creare nodi comunicanti tra loro tramite topic (e non solo) ed esposto benchmark e analisi completa a tempo di compilazione.
 
 La nostra esperienza sottolinea l'importanza di una solida comprensione delle basi di ROS 2 e delle pratiche di low-level-programming per navigare con successo nel suo ecosistema, specialmente quando si affrontano sfide legate a hardware e architetture specifiche.
 
