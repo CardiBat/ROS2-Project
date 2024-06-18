@@ -1353,6 +1353,13 @@ _In entrambi i casi_, la RAM occupata è pari a 100MB circa.
 
 ## Analisi dei consumi a tempo di compilazione
 
+Si procede dunque a capire i consumi in termini di memoria/CPU a tempo di compilazione di questi pacchetti scelti. Per prima cosa, notiamo che la grandezza del progetto è pari a circa 800MB:
+
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/peso.jpg" alt="peso.jpg">
+</div>
+<p>&nbsp;</p>
 
 
 
