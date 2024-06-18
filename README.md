@@ -964,9 +964,9 @@ ros2 run my_package_2 my_node_2
 Di fatti `ros2` non verrebbe trovato. Specifico quindi a compilazione dove cercare le librerie compilate e le altre esterne necessarie in modo tale di non incontrare problemi se utilizzo `./exec` per il run, nativo per g++. 
 
 
-## Benchmarking delle prestazioni
+## Analisi finali
 
-Si rende ora necessario poter monitorare le risorse richieste durante l'esecuzione (per un futuro export su FPGA ad esempio). Per non dover ricorrere ad altre installazioni esterne alla macchina (che potrebbero portare via molto tempo e potrebbero risultare incompatibili), si utilizza htop dopo le run delle macchine per poter monitorare queste informazioni. 
+Si rende ora necessario poter monitorare le risorse richieste durante l'esecuzione e la compilazione (per un futuro export su FPGA ad esempio). Per non dover ricorrere ad altre installazioni esterne alla macchina (che potrebbero portare via molto tempo e potrebbero risultare incompatibili), si utilizza htop dopo le run per poter monitorare queste informazioni. 
 
 Le colonne che ci interessano sono:
 
@@ -979,8 +979,6 @@ Dopo aver runnato entrambi i nodi, ricercarli tramite filtro:
 - Incollare (Ctrl-alt-V) il seguente filtro dei nodi: client|server. Premere quindi invio.
 
 _Ricordiamoci infine che la macchina che stiamo utilizzando ha 4 core SiFive U74-MC da 1.5GHz di clock e 16GB di RAM_
-
-### Benchmarking delle risorse durante l'installazione dei pacchetti di ROS2
 
 ### Benchmarking delle risorse a run-time al variare dell'intensità di comunicazione
 
