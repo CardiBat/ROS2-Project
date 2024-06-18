@@ -959,22 +959,412 @@ ros2 run my_package_2 my_node_2
 are not available. In fact, `ros2` would not be found. Therefore, I specify at compilation where to find the compiled libraries and other necessary external ones so that I encounter no issues if I use `./exec` for running, which is native for g++. 
 
 
+## Final Analysis
+
+It is now necessary to monitor the resources required during execution and compilation (for future export to FPGA, for example). To avoid having to resort to other external installations (which could take a lot of time and might be incompatible), we use htop after the runs to monitor this information.
+
+The columns that interest us are:
+
+- CPU Usage (%CPU): Checks if the process requires a lot of CPU time.
+- Resident Memory (RES): The amount of RAM actually used by the process.
+
+After running both nodes, search for them using the filter:
+
+- Press f4 (filter)
+- Paste (Ctrl-alt-V) the following node filter: client|server. Then press enter.
+
+_Let us remember that the machine we are using has 4 SiFive U74-MC cores at 1.5GHz clock and 16GB of RAM._
+
+### Benchmarking Runtime Resources with Varying Communication Intensity
+
+To obtain information on the runtime resources required by the program, it is necessary to modify the code so that it is possible to change the message sending frequency during the run (without having to recompile each time). Therefore, the publisher node is modified according to this specification (and avoiding printing to the terminal in both nodes).
+
+```cpp
+public:
+    ClientNode(int publish_frequency_ms) : Node("client_node")
+    {
+        // Create the publisher
+        publisher_ = this->create_publisher<std_msgs::msg::Int32>("server_topic", 10);
+
+        // Create the timer with configurable frequency
+        timer_ = this->create_wall_timer(
+            std::chrono::milliseconds(publish_frequency_ms), 
+            std::bind(&ClientNode::send_message, this)
+        );
+
+        // Start log
+        RCLCPP_INFO(this->get_logger(), "Client node started with frequency: %d ms", publish_frequency_ms);
+    }
+
+private:
+    void send_message()
+    {
+        // Send messages (2 types)
+        auto message = std_msgs::msg::Int32();
+        message.data = 1; // Change to 2 if necessary
+
+        publisher_->publish(message);
+    }
+
+    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr publisher_;
+    rclcpp::TimerBase::SharedPtr timer_;
+};
+
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+
+    // Check if an argument was passed
+    if (argc < 2) {
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Usage: client_node <publish_frequency_ms>");
+        return 1;
+    }
+
+    // Convert the argument to integer
+    int publish_frequency_ms = std::atoi(argv[1]);
+
+    // Check if the argument is valid
+    if (publish_frequency_ms <= 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Invalid publish frequency: %d ms", publish_frequency_ms);
+        return 1;
+    }
+
+    // Create the node with the specified publishing frequency
+    auto node = std::make_shared<ClientNode>(publish_frequency_ms);
+
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+```
+
+The server node instead writes to a file to check that everything is okay:
+```cpp
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/int32.hpp>
+#include <fstream>
+
+class ServerNode : public rclcpp::Node
+{
+public:
+    ServerNode(std::shared_ptr<std::ofstream> log_file) 
+        : Node("server_node"), log_file_(log_file)
+    {
+        subscription_ = this->create_subscription<std_msgs::msg::Int32>(
+            "server_topic", 10, std::bind(&ServerNode::handle_message, this, std::placeholders::_1));
+    }
+
+private:
+    void handle_message(const std_msgs::msg::Int32::SharedPtr msg)
+    {
+        int result = 0;
+        if (msg->data == 1)
+        {
+            result = function1();
+        }
+        else if (msg->data == 2)
+        {
+            result = function2();
+        }
+        else
+        {
+            *log_file_ << "Received unsupported value: " << msg->data << std::endl;
+            return;
+        }
+
+        *log_file_ << "Function result: " << result << std::endl;
+    }
+
+    int function1()
+    {
+        *log_file_ << "Executing function1" << std::endl;
+        return 10; // example return value
+    }
+
+    int function2()
+    {
+        *log_file_ << "Executing function2" << std::endl;
+        return 20; // example return value
+    }
+
+    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr subscription_;
+    std::shared_ptr<std::ofstream> log_file_;
+};
+
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+
+    // Open the log file
+    auto log_file = std::make_shared<std::ofstream>("/home/fsimoni/ros2_foxy_ws/output.txt", std::ios_base::app);
+
+    auto node = std::make_shared<ServerNode>(log_file);
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+```
+
+At this point, after compiling, it is possible to run the publisher node by passing the frequency parameter (s) with 5ms = about 200 messages per second
+
+```sh
+./client_benchmark 5 &
+```
+
+After also starting the subscriber and the interaction has begun, you can see the specific resource management for these two nodes in the terminal using the customized htop command that finds the PIDs of the processes and monitors only them:
+
+```sh
+htop -p $(pgrep -d',' -f 'client_benchmark|server_benchmark')
+```
+
+Or, to be more accurate, you can run (for RAM):
+```sh
+ps aux | grep -E 'client_benchmark|server_benchmark' | grep -v grep | awk '{sum += $6} END {print sum/1024 " MB"}'
+```
+And for CPU:
+```sh
+ps aux | grep -E 'client_benchmark|server_benchmark' | grep -v grep | awk '{sum += $3} END {print sum " %"}'
+```
+
+Note that it is convenient, at compile time, to give specific names to the nodes to run to avoid the ps command searching for other processes with similar names.
+
+Before proceeding with the benchmarking, you need to choose the message exchange frequencies to test. Normally, a mobile robot has this configuration:
+
+- LiDAR: 2 sensors at 10 Hz, 0.05MB per message
+- Camera: 2 cameras at 30 Hz, 1.5MB per message
+- Inertial Measurement Unit (IMU): 1 sensor at 100 Hz, 0.0005MB per message
+- Distance sensors: 4 sensors at 10 Hz, 0.0005MB per message
+- Temperature sensors: 2 sensors at 1 Hz, 0.0005MB per message
+
+As a result, about 220 messages per second are exchanged, with a total weight of about 90MB per second. For simplicity, we can say that each message weighs about 0.4MB.
+
+Therefore, two other nodes modified based on these specifications will be used:
+
+### Client
+```cpp
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/string.hpp"
+#include <cstdlib>
+#include <string>
+
+class ClientNode : public rclcpp::Node
+{
+public:
+    ClientNode(int publish_frequency_ms) : Node("client_node")
+    {
+        // Create the publisher
+        publisher_ = this->create_publisher<std_msgs::msg::String>("server_topic", 10);
+
+        // Create the timer with configurable frequency
+        timer_ = this->create_wall_timer(
+            std::chrono::milliseconds(publish_frequency_ms), 
+            std::bind(&ClientNode::send_message, this)
+        );
+
+        // Start log
+        RCLCPP_INFO(this->get_logger(), "Client node started with frequency: %d ms", publish_frequency_ms);
+    }
+
+private:
+    void send_message()
+    {
+        // Create a 0.4 MB message
+        auto message = std_msgs::msg::String();
+        message.data = std::string(400 * 1024, '0'); // 400 KB string
+
+        // Publish the message
+        publisher_->publish(message);
+    }
+
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+    rclcpp::TimerBase::SharedPtr timer_;
+};
+
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+
+    // Check if an argument was passed
+    if (argc < 2) {
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Usage: client_node <publish_frequency_ms>");
+        return 1;
+    }
+
+    // Convert the argument to an integer
+    int publish_frequency_ms = std::atoi(argv[1]);
+
+    // Check if the argument is valid
+    if (publish_frequency_ms <= 0) {
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Invalid publish frequency: %d ms", publish_frequency_ms);
+        return 1;
+    }
+
+    // Create the node with the specified publishing frequency
+    auto node = std::make_shared<ClientNode>(publish_frequency_ms);
+
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+```
+
+### Server
+```cpp
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/int32.hpp>
+#include <std_msgs/msg/string.hpp>
+#include <fstream>
+
+class ServerNode : public rclcpp::Node
+{
+public:
+    ServerNode(std::shared_ptr<std::ofstream> log_file) 
+        : Node("server_node"), log_file_(log_file)
+    {
+        subscription_int_ = this->create_subscription<std_msgs::msg::Int32>(
+            "server_topic", 10, std::bind(&ServerNode::handle_int_message, this, std::placeholders::_1));
+
+        subscription_string_ = this->create_subscription<std_msgs::msg::String>(
+            "server_topic", 10, std::bind(&ServerNode::handle_string_message, this, std::placeholders::_1));
+    }
+
+private:
+    void handle_int_message(const std_msgs::msg::Int32::SharedPtr msg)
+    {
+        int result = 0;
+        if (msg->data == 1)
+        {
+            result = function1();
+        }
+        else if (msg->data == 2)
+        {
+            result = function2();
+        }
+        else
+        {
+            *log_file_ << "Received unsupported value: " << msg->data << std::endl;
+            return;
+        }
+
+        *log_file_ << "Function result: " << result << std::endl;
+    }
+
+    void handle_string_message(const std_msgs::msg::String::SharedPtr msg)
+    {
+        // Log the received message
+        *log_file_ << "Received string message of size: " << msg->data.size() << " bytes" << std::endl;
+    }
+
+    int function1()
+    {
+        *log_file_ << "Executing function1" << std::endl;
+        return 10; // example return value
+    }
+
+    int function2()
+    {
+        *log_file_ << "Executing function2" << std::endl;
+        return 20; // example return value
+    }
+
+    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr subscription_int_;
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_string_;
+    std::shared_ptr<std::ofstream> log_file_;
+};
+
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+
+    // Open the log file
+    auto log_file = std::make_shared<std::ofstream>("/home/fsimoni/ros2_foxy_ws/output.txt", std::ios_base::app);
+
+    auto node = std::make_shared<ServerNode>(log_file);
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+```
+
+### Benchmarking Resource Consumption
+
+By proceeding with the benchmarking in the case of integer message exchange (as we had before), we get:
+
+- In the case of infrequent message exchanges (about 10 per second), a low CPU usage of 2.8%
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/100ms-int.png" alt="100ms-int.png">
+</div>
+<p>&nbsp;</p>
+
+- In the case of real exchanges (200 per second), 14%, about 4 times more
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/cpu-5ms-int.png" alt="cpu-5ms-int.png">
+</div>
+<p>&nbsp;</p>
+
+_In both cases_, the occupied RAM is 50MB
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/ram-int.png" alt="ram-int.png">
+</div>
+<p>&nbsp;</p>
+
+By proceeding with message exchanges of 400KB, we get:
+
+- In the case of infrequent message exchanges (about 10 per second), a low CPU usage of 42.9%
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/cpu-100ms-400kb.png" alt="cpu-100ms-400kb.png">
+</div>
+<p>&nbsp;</p>
+
+- In the case of real exchanges (200 per second), 168%, here too about 4 times more. Note that it therefore requires another core.
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/cpu-5ms-400kb.png" alt="cpu-5ms-400kb.png">
+</div>
+<p>&nbsp;</p>
+
+_In both cases_, the occupied RAM is about 100MB.
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/ram-400kb.png" alt="ram-400kb.png">
+</div>
+<p>&nbsp;</p>
+
+
+### Analysis of Compilation Time Consumption
+
+Next, we proceed to understand the memory/CPU consumption during the compilation of these selected packages. First of all, we note that the size of the project is about 800MB:
+
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/peso.jpg" alt="peso.jpg">
+</div>
+<p>&nbsp;</p>
+
+At this point, it is advisable to create a completely new environment by cloning the modified sources into `src` in the new folder. Then, create a new `build` directory and test its functionality through `colcon` compilation (as at the beginning).
+
+We then begin to analyze the consumption during the compilation and print the results obtained in a log file.
+
 ## Conclusions
 
 ### Porting Objective Achieved
 
-During this project, we delved into and navigated through the complex experience of porting ROS2 onto a RISC-V architecture, uncovering technical challenges and exploring various possible solutions. Throughout this journey, we managed to overcome several obstacles by adapting ROS to an unsupported environment, demonstrating its feasibility.
+During this project, we explored and navigated through the complex experience of porting ROS2 to a RISC-V architecture, discovering technical challenges and exploring various possible solutions. During this journey, we managed to overcome several obstacles, adapting ROS to an unsupported environment, demonstrating the feasibility of the implementation.
 
-After explaining how ROS operates and analyzing how it is used on Ubuntu, we dived into RISC-V and attempted to compile a package for node creation. The outcome was successful, and we were able to create fully functional example nodes.
+After explaining the functionality of ROS and analyzing how it is used on Ubuntu, we delved into RISC-V, trying to compile a package for creating nodes. The outcome was successful, and we managed to create fully functional example nodes. We have demonstrated that it is possible to create nodes that communicate with each other through topics (and more) and presented a complete benchmark and compilation time analysis.
 
-Our experience highlights the importance of a solid understanding of the fundamentals of ROS 2 and low-level programming practices for successfully navigating its ecosystem, especially when facing challenges related to specific hardware and architectures.
+Our experience underscores the importance of a solid understanding of the basics of ROS 2 and low-level programming practices to successfully navigate its ecosystem, especially when dealing with challenges related to specific hardware and architectures.
 
-We hope that this document will serve not only as a tutorial on how to install ROS on RISC-V but also on how to approach any CISC -> RISC porting. Indeed, here one can observe all the strategies that can be applied, such as avoiding non-essential portions during installation, making ad hoc compiler modifications, resolving dependencies step-by-step, and so on.
+We hope that this document not only serves as a tutorial on how to install ROS on RISC-V but also on how to approach any CISC to RISC porting. In fact, here you can notice all the strategies that can be applied, such as avoiding non-essential portions during installation, ad hoc modification of the compiler, step-by-step resolution for each dependency, and so on.
 
 ### Future Developments
 
-The project thus showcases some examples of node execution. In the future, the functionalities of these nodes could obviously be enhanced by, for example, adding other libraries making it usable in a real automated hardware system such as robots or by connecting to physical sensors on boards.
+The project thus showcases some examples of node execution. In the future, the functionality of these nodes can obviously be increased by adding, for example, other libraries, making them usable in a real automatic hardware system like robots or connecting to physical sensors on boards.
 
-Furthermore, these steps could be applied to install other libraries like `rclpy`, the Python equivalent of `rclcpp`. By doing so, one could create much more complex and modern nodes for a much more extensive control over various hardware components.
+Additionally, these steps could be applied to install other libraries like `rclpy`, the Python equivalent of `rclcpp` for nodes. By doing so, much more complex and modern nodes could be created for much broader control over various hardware components.
 
-Finally, another development could be to focus on the operation of the test packages, which were ignored in this guide for time reasons. Their operation would allow for specific testing of the created nodes.
+Finally, another development could be to focus on the operation of the test packages, ignored in this guide for time reasons. Their functionality would allow for specific testing of the created nodes.
