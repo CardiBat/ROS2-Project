@@ -1351,6 +1351,12 @@ _In entrambi i casi_, la RAM occupata è pari a 100MB circa.
 <p>&nbsp;</p>
 
 
+## Analisi dei consumi a tempo di compilazione
+
+
+
+
+
 ## Conclusioni
 
 ### Obiettivo di porting soddisfatto
