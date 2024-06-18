@@ -1359,11 +1359,57 @@ Si procede dunque a capire i consumi in termini di memoria/CPU a tempo di compil
 </div>
 <p>&nbsp;</p>
 
-A questo punto, conviene creare un ambiente completamente nuovo clonando i sorgenti modificati in `src` nella nuova cartella. Creare quindi nuovamente una dir `build` e testarne il funzionamento tramite compilazione `colcon` (come all'inizio). 
+Per analizzare i consumi conviene creare un ambiente completamente nuovo clonando i sorgenti modificati in `src` nella nuova cartella.
+Inoltre abbiamo implementato due script:
 
-Si inizia quindi ad analizzare i consumi durante la compilazione e stampando su un log file i risultati ottenuti:
+- `script.sh` : implementa tutta la logica che automatizza il processo di compilazione dei pacchetti spiegato sopra
 
+- `script_monitor.sh`: permette esecuzione e analisi di `script.sh`
 
+In allegato il codice di `script_monitor.sh`:
+
+```bash
+#!/bin/bash
+
+# Nome del file dello script da monitorare
+SCRIPT_TO_RUN="script.sh"
+
+# File di log
+COMPILATION_LOG="compilation_log.txt"
+VMSTAT_LOG="vmstat_log.txt"
+TOP_LOG="top_log.txt"
+
+# Inizio registrazione dei log
+{
+    echo "Compilazione iniziata: $(date)"
+    /usr/bin/time -v bash $SCRIPT_TO_RUN 2>&1 | tee -a $COMPILATION_LOG
+    echo "Compilazione terminata: $(date)"
+} 2>&1 | tee $COMPILATION_LOG &
+
+# PID dello script di compilazione
+COMPILATION_PID=$!
+
+# Inizio monitoraggio delle prestazioni
+vmstat 1 > $VMSTAT_LOG &
+VMSTAT_PID=$!
+
+top -b -d 1 -p $COMPILATION_PID > $TOP_LOG &
+TOP_PID=$!
+
+# Attendere la fine della compilazione
+wait $COMPILATION_PID
+
+# Fermare il monitoraggio delle prestazioni
+kill $VMSTAT_PID
+kill $TOP_PID
+
+echo "Monitoraggio completato. I log sono stati salvati in $COMPILATION_LOG, $VMSTAT_LOG e $TOP_LOG."
+
+In particolare ci siamo soffermati su come monitorare dettagliatamente le risorse utilizzate durante la compilazione di ROS. 
+
+Lo script avvia la registrazione dei log di compilazione, utilizzando `/usr/bin/time` per tracciare il tempo di esecuzione e le risorse consumate. Parallelamente, avvia `vmstat` e `top` per monitorare rispettivamente l'uso della memoria e della CPU in tempo reale. Questi dati vengono salvati nei file di log `compilation_log.txt`, `vmstat_log.txt` e `top_log.txt`.
+
+Allego una tabella conclusiva dei consumi 
 
 ## Conclusioni
 
