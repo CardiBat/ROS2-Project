@@ -1416,7 +1416,7 @@ Attraverso i dati emersi abbiamo prodotto i seguenti grafici:
 
 <p>&nbsp;</p>
 <div align="center">
-  <img src="/DiagrammaTortaConsumi.jpg" alt="DiagrammaTortaConsumi.jpg">
+  <img src="/DiagrammaTortaConsumi.jpeg" alt="DiagrammaTortaConsumi.jpeg">
 </div>
 <p>&nbsp;</p>
 
@@ -1426,7 +1426,7 @@ Per quanto riguarda la memoria, il grafico evidenzia che il 92,9% della memoria 
 
 <p>&nbsp;</p>
 <div align="center">
-  <img src="/GraficoCPU.jpg" alt="GraficoCPU.jpg">
+  <img src="/GraficoCPU.jpeg" alt="GraficoCPU.jpeg">
 </div>
 <p>&nbsp;</p>
 
@@ -1440,7 +1440,7 @@ Per una panoramica completa dei valori ottenuti abbiamo sintetizzato il tutto at
 
 <p>&nbsp;</p>
 <div align="center">
-  <img src="/StatisticheOutput.jpg" alt="StatisticheOutput.jpg">
+  <img src="/StatisticheOutput.png" alt="StatisticheOutput.png">
 </div>
 <p>&nbsp;</p>
 
