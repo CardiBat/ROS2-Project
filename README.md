@@ -1405,6 +1405,8 @@ kill $TOP_PID
 
 echo "Monitoraggio completato. I log sono stati salvati in $COMPILATION_LOG, $VMSTAT_LOG e $TOP_LOG."
 
+```
+
 In particolare ci siamo soffermati su come monitorare dettagliatamente le risorse utilizzate durante la compilazione di ROS. 
 
 Lo script avvia la registrazione dei log di compilazione, utilizzando `/usr/bin/time` per tracciare il tempo di esecuzione e le risorse consumate. Parallelamente, avvia `vmstat` e `top` per monitorare rispettivamente l'uso della memoria e della CPU in tempo reale. Questi dati vengono salvati nei file di log `compilation_log.txt`, `vmstat_log.txt` e `top_log.txt`.
