@@ -1409,7 +1409,40 @@ In particolare ci siamo soffermati su come monitorare dettagliatamente le risors
 
 Lo script avvia la registrazione dei log di compilazione, utilizzando `/usr/bin/time` per tracciare il tempo di esecuzione e le risorse consumate. Parallelamente, avvia `vmstat` e `top` per monitorare rispettivamente l'uso della memoria e della CPU in tempo reale. Questi dati vengono salvati nei file di log `compilation_log.txt`, `vmstat_log.txt` e `top_log.txt`.
 
-Allego una tabella conclusiva dei consumi 
+Attraverso i dati emersi abbiamo prodotto i seguenti grafici:
+
+
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/DiagrammaTortaConsumi.jpg" alt="DiagrammaTortaConsumi.jpg">
+</div>
+<p>&nbsp;</p>
+
+Il diagramma a torta per l'uso della CPU mostra una predominanza dell'attività 'utente' (compilazione di ROS), che rappresenta il 70% dell'utilizzo totale della CPU. Le attività di sistema costituiscono il 9,4%, mentre il 20,4% della CPU rimane inattivo. Da notare il 'wait usage cpu' (tempo di attesa della cpu) molto basso ~ 0.2%, questo implica un'ottima efficenza della CPU. Il termine "wait" (attesa) si riferisce al tempo durante il quale la CPU è inattiva in attesa che vengano completate operazioni di I/O (Input/Output). In pratica, la CPU non sta eseguendo istruzioni poiché sta aspettando che dispositivi esterni completino le loro operazioni di lettura o scrittura. 
+
+Per quanto riguarda la memoria, il grafico evidenzia che il 92,9% della memoria è libera, con solo il 3,9% usato e il 3,2% destinato a buffer/cache. Abbiamo reputato interessante studiare il comportamento della CPU rispetto al tempo. 
+
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/GraficoCPU.jpg" alt="GraficoCPU.jpg">
+</div>
+<p>&nbsp;</p>
+
+Ci teniamo a precisare che il grafico sovrastante è una registrazione dei primi ~ 15 minuti per motivi dimostrativi. 
+
+Il tempo zero (x=0) è caratterizzato dall' avvio di colcon ossia l'inizio del processo di compilazione. Inoltre abbiamo reputato sensato quello di sommare 'User CPU' + 'System CPU' in modo da valutare complessiavamente il risultato finale della macchina sotto stress dall'operazione di compilazione. Ovviamente avendo visto i risultati dal grafico a torta avevamo delle aspettative che sono state rispettate.
+
+Il processo di compilazione avvinee con 4 CORE (limitazione hardware). Ogni core si predisponde di compilare un pacchetto. Nel momento in cui un pacchetto è compilato viene rilasciata quell'area di memoria e viene associato un ulteriore pacchetto. I picchi del grafico rilevano proprio gli istanti in cui un pacchetto viene rilasciato e successivaente un secondo viene associato al CORE. Ad ogni modo a regime di compilazione viene usato il 100% di CPU
+
+Per una panoramica completa dei valori ottenuti abbiamo sintetizzato il tutto attraverso questa taballa§
+
+<p>&nbsp;</p>
+<div align="center">
+  <img src="/StatisticheOutput.jpg" alt="StatisticheOutput.jpg">
+</div>
+<p>&nbsp;</p>
+
+
 
 ## Conclusioni
 
